@@ -17,3 +17,7 @@ composer.phar
 
 ### Config ###
 config.php
+/templates/bower_components/*
+/templates/.sass-cache/*
+*.DS_Store
+/templates/stylesheets/*
