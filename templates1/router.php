@@ -1,0 +1,185 @@
+<?php
+
+/*function getFirmwareList(WirePage $page){
+  $children = $page->children;
+  if(count($children)){ }else{return "Es existiert derzeit keine Firmware für diesen Router"};
+
+  foreach($children as $firmware){
+    $art = array();
+    $version =
+    $datum =
+    $MD5 =
+    $download =
+    $size =
+
+      <ul class='accordion' data-accordion>
+        <li class='accordion-navigation'>
+          <a href='#stable'>Stable</a>
+          <div id='stable' class='content'>
+            Wenn du einen Router mit Originalfirmware hast oder dir nicht sicher bist was genau du brauchst dann nimm die Factory-Firmware. Um deinen Router mit Freifunk-Firmware zu aktualisieren kannst du Sysupgread benutzen.
+            <h4><span data-tooltip aria-haspopup='true' class='has-tip' title='Möchtest du deinen Router zum Freifunk-Router umfunktionieren bist du hier richtig.'>Factory</span></h4>
+            <table class='firmware-download-list'>
+              <thead>
+                <tr>
+                  <th width='50'>Version/<br/>Modell</th>
+                  <th width='50'>Datum</th>
+                  <th width='200'>MD5</th>
+                  <th>Download</th>
+                  <th width='50'>Größe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/09</td>
+                  <td>bc4d277862322960c6ac948244796b08</td>
+                  <td><a href='#'>gluon-ffmyk-0.7-stable-2015-09-09-tp-link-tl-wdr4300-v1.bin</a><br/>
+                  </td>
+                  <td>7.8M</td>
+                </tr>
+              </tbody>
+            </table><!-- table factory -->
+            <h4><span data-tooltip aria-haspopup='true' class='has-tip' title='Möchtest du deinen Freifunk-Router Aktualisieren dann ist Sysupgread die richtige Wahl.'>Sysupgread</span></h4>
+            <table class='firmware-download-list'>
+              <thead>
+                <tr>
+                  <th width='50'>Version/<br/>Modell</th>
+                  <th width='50'>Datum</th>
+                  <th>MD5</th>
+                  <th>Download</th>
+                  <th>Größe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/11/9</td>
+                  <td>ed55573ebb33f626134807aafd173133</td>
+                  <td><a href='#'>gluon-ffmyk-2015.1.2-nightly-2015-11-08-tp-link-tl-wdr4300-v1.bin</a></td>
+                  <td>3.8M</td>
+                </tr>
+              </tbody>
+            </table><!-- table sysupgread -->
+          </div><!-- #stable -->
+        </li><!-- #accordion stable -->
+        <li class='accordion-navigation'>
+          <a href='#nightly'>Nightly</a>
+          <div id='nightly' class='content'>
+            <h4>Factory</h4>
+            <table class='firmware-download-list'>
+              <thead>
+                <tr>
+                  <th width='50'>Version/<br/>Modell</th>
+                  <th width='50'>Datum</th>
+                  <th width='200'>MD5</th>
+                  <th>Download</th>
+                  <th width='50'>Größe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/11/11</td>
+                  <td>bc4d277862322960c6ac948244796b08</td>
+                  <td><a href='#'>gluon-ffmyk-0.7-stable-2015-09-09-tp-link-tl-wdr4300-v1.bin</a><br/>
+                  </td>
+                  <td>7.8M</td>
+                </tr>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/11/10</td>
+                  <td>bc4d277862322960c6ac948244796b08</td>
+                  <td><a href='#'>gluon-ffmyk-0.7-stable-2015-09-09-tp-link-tl-wdr4300-v1.bin</a><br/>
+                  </td>
+                  <td>7.8M</td>
+                </tr>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/11/09</td>
+                  <td>bc4d277862322960c6ac948244796b08</td>
+                  <td><a href='#'>gluon-ffmyk-0.7-stable-2015-09-09-tp-link-tl-wdr4300-v1.bin</a><br/>
+                  </td>
+                  <td>7.8M</td>
+                </tr>
+              </tbody>
+            </table><!-- table fectory -->
+            <h4>Sysupgread</h4>
+            <table class='firmware-download-list'>
+              <thead>
+                <tr>
+                  <th width='50'>Version/<br/>Modell</th>
+                  <th width='50'>Datum</th>
+                  <th>MD5</th>
+                  <th>Download</th>
+                  <th>Größe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/11/10</td>
+                  <td>ed55573ebb33f626134807aafd173133</td>
+                  <td><a href='#'>gluon-ffmyk-2015.1.2-nightly-2015-11-08-tp-link-tl-wdr4300-v1.bin</a></td>
+                  <td>7.8M</td>
+                </tr>
+                <tr>
+                  <td>v1</td>
+                  <td>2015/11/9</td>
+                  <td>ed55573ebb33f626134807aafd173133</td>
+                  <td><a href='#'>gluon-ffmyk-2015.1.2-nightly-2015-11-08-tp-link-tl-wdr4300-v1.bin</a></td>
+                  <td>7.8M</td>
+                </tr>
+              </tbody>
+            </table><!-- table sysupgread -->
+          </div><!-- #nightly -->
+        </li><!-- nightly -->
+      </ul><!-- #arcordion -->
+    }
+}
+
+$firmware = getFirmwareList($page);*/
+
+$r = $pages->get("name=tp-link-cpe210-v1.1, template=hersteller");
+echo $r->name;
+
+$firmware = "Die Firmware Eingabe ist derzeit noch nicht umgesetzt.";
+$besonderheiten = (!empty($page->body) ? "Es gibt keine Besonderheiten" : $page->body );
+$features = getTag($page->features);
+$image = (count($page->image) ? $page->image->first()->size(250,250)->url : 'https://placehold.it/250x250?text=No Image');
+
+$output ="<article id='article' class='large-12 columns'>
+            <div class='row'>
+              <div class='large-9 columns'>
+                <h1>{$page->parent->title} $title</h1>
+                <p>
+                {$page->summary}
+                </p>
+                <hr>
+                <h2>Besonderheiten</h2>
+                <p>
+                $besonderheiten
+                </p>
+                <h2>Firmware</h2>
+                <p>
+                  Im Folgenden findest du die Firmware zum Router. Für den produktiven - also möglichst ausfallsicheren - Betrieb solltest du die Stable Firmware nutzen. Diese wird vor der Veröffentlichung getestet und enthält meistens keine Fehler mehr.
+                </p>
+                $firmware
+              </div><!-- #columns large-9 -->
+              <div id='router-infobox' class='large-3 columns'>
+                <div class='panel'>
+                  <img class='responsive' src='$image'></img>
+
+                  <hr>
+                  Hersteller: <a href='{$page->parent->website}'>{$page->parent->title}</a><br/>
+                  OpenWrt: <a href='https://wiki.openwrt.org/toh/{$page->parent->name}/{$page->name}'>$page->title</a><br/>
+                  <hr>
+                  <h4>Features</h4>
+                  <ul class='features'>
+                    $features
+                  </ul>
+                </div><!-- #panel -->
+              </div><!-- #router-infobox -->
+            </div><!-- #row -->
+          </article><!-- #article -->";
+
+$content = $output;
