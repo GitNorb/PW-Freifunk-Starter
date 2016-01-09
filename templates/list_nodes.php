@@ -67,6 +67,17 @@ if($input->urlSegment1){
         $session->remove('mac');
       }
       break;
+      case 'keys':
+          $useMain = false;
+          $nodes = $pages->find("template=node, key!=''");
+          $router = array();
+          foreach($nodes as $node) {
+              $router[] = array('MAC' => "{$node->title}",
+                                'PublicKey' => "{$node->key}");
+          }
+
+          echo serialize($router);
+        break;
     default:
       throw new Wire404Exception();
   }
