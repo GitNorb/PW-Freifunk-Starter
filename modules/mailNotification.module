@@ -1,0 +1,151 @@
+<?php
+
+class mailNotification extends WireData implements Module, ConfigurableModule
+{
+    protected $mailAddress, $mailBody, $notificationSave, $notificationDelete, $notificationChange, $notificationTemplates;
+
+    public static function getModuleInfo() {
+        return array(
+            'title' => __('Mail Notification'),
+            'version' => '001',
+            'author' => 'Kreativmonkey',
+            'summary' => __('Notification mail by saving or deleting Pages'),
+            'singular' => true,
+            'autoload' => true
+        );
+    }
+
+    public function ___install() {
+
+    }
+
+    public function init() {
+        if (isset ($this->data ['mailAddress'])) {
+
+        }
+
+        if (isset ($this->data ['notificationSave'])){
+          foreach ($this->data ['notificationSave'] as $x) {
+            $template = $this->templates->get($x);
+            $this->notificationSave->add($template);
+          }
+        }
+
+        if (isset ($this->data ['notificatioDelete'])){
+          foreach ($this->data ['notificatioDelete'] as $x) {
+            $template = $this->templates->get($x);
+            $this->notificatioDelete->add($template);
+          }
+        }
+
+        if (isset ($this->data ['notificationChange'])){
+          foreach ($this->data ['notificationChange'] as $x) {
+            $template = $this->templates->get($x);
+            $this->notificationChange->add($template);
+          }
+        }
+
+        #$this->pages->addHookBefore("delete", $this, "ldapHelperDeleteUser");
+        #$this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
+    }
+
+    public function hookPageSave(){
+
+    }
+    public function hookPageDelete(){
+
+    }
+    public function hookPageChange(){
+
+    }
+    public function sendMail($message){
+
+    }
+
+    public function hookModuleSave(HookEvent $event) {
+       $className = $event->arguments [0];
+       if ($className != get_class($this)) return;
+       $this->validateConfiguration();
+     }
+
+    static public function getModuleConfigInputfields(array $data) {
+        $inputfields = new InputfieldWrapper ();
+
+        $mailAddressField = wire('modules')->get('InputfieldText');
+        $mailAddressField->name = 'mailAddress';
+        $mailAddressField->columnWidth = 80;
+        $mailAddressField->label = __('Mail Addresses');
+        $mailAddressField->required = 1;
+        if (isset ($data ['mailAddress']))
+            $mailAddressField->value = $data ['mailAddress'];
+        $mailAddressField->description = __('Mailaddresses like mail@domain.tdl or a username ore user groupe. You can choose more than one address by comma separet.');
+        $inputfields->add($mailAddressField);
+
+        $useSSLField = wire('modules')->get('InputfieldCheckbox');
+        $useSSLField->name = 'useSSL';
+        $useSSLField->columnWidth = 20;
+        $useSSLField->label = __('Use SSL?');
+        $useSSLField->description = __('Connects to the LDAP Server via SSL.');
+        if (isset ($data ['useSSL']) && $data ['useSSL'] == 1)
+            $useSSLField->checked = 1;
+        $inputfields->add($useSSLField);
+
+        $useV3Field = wire('modules')->get('InputfieldCheckbox');
+        $useV3Field->name = 'useV3';
+        $useV3Field->columnWidth = 20;
+        $useV3Field->label = __('Use Protocol V3?');
+        $useV3Field->description = __('Use LDAP Protocol V3.');
+        if (isset ($data ['useV3']) && $data ['useV3'] == 1)
+            $useV3Field->checked = 1;
+        $inputfields->add($useV3Field);
+
+        $defaultLoginDomainField = wire('modules')->get('InputfieldText');
+        $defaultLoginDomainField->name = 'loginDomain';
+        $defaultLoginDomainField->label = __('Default Login Domain');
+        $defaultLoginDomainField->required = 1;
+        if (isset ($data ['loginDomain']))
+            $defaultLoginDomainField->value = $data ['loginDomain'];
+        $defaultLoginDomainField->description = __('This is the domain name used by default if the user does not supply a domain name. It will be added to the username, e.g. username@domainname.com');
+        $inputfields->add($defaultLoginDomainField);
+
+        $adminLoginField = wire('modules')->get('InputfieldText');
+        $adminLoginField->name = 'admin';
+        $adminLoginField->columnWidth = 50;
+        $adminLoginField->label = __('LDAP Admin');
+        $adminLoginField->required = 1;
+        if (isset ($data ['admin']))
+            $adminLoginField->value = $data ['admin'];
+        $adminLoginField->description = __('An LDAP account with access to add/edit/delet users.');
+        $inputfields->add($adminLoginField);
+
+        $secretField = wire('modules')->get('InputfieldText');
+        $secretField->attr ('type','password');
+        $secretField->name = 'secret';
+        $secretField->columnWidth = 50;
+        $secretField->label = __('LDAP Admin Secret');
+        $secretField->description = __('Needet to use with LDAP Admin to add/edit/delete users.');
+        if (isset ($data ['secret']))
+            $secretField->value = $data ['secret'];
+        $inputfields->add($secretField);
+
+        $notificationSaveField = wire('modules')->get('InputfieldPageListSelectMultiple');
+        $notificationSaveField->name = 'notificationSave';
+        $notificationSaveField->label = __('Notification Save');
+        $notificationSaveField->description = __('All templates you would like to get notification by saving pages.');
+        $notificationSaveField->parent_id = wire('templates');
+        if (isset ($data ['notificationSave']))
+            $notificationSaveField->value = $data ['notificationSave'];
+        $inputfields->add($notificationSaveField);
+
+        $debugField = wire('modules')->get('InputfieldCheckbox');
+        $debugField->name = 'debug';
+        $debugField->collapsed = Inputfield::collapsedYes;
+        $debugField->label = __('Debug Mode');
+        $debugField->description = __('Turns on the debug mode so you can see the output of PHP\'s ldap module in the apache log.');
+        if (isset ($data ['debug']) && $data ['debug'] == 1)
+            $debugField->checked = 1;
+        $inputfields->add($debugField);
+
+        return $inputfields;
+    }
+}
