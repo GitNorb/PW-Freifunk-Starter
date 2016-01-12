@@ -20,7 +20,7 @@ class mailNotification extends WireData implements Module, ConfigurableModule
     }
 
     public function init() {
-        /*if (isset ($this->data ['mailAddress'])) {
+        if (isset ($this->data ['mailAddress'])) {
 
         }
 
@@ -45,13 +45,50 @@ class mailNotification extends WireData implements Module, ConfigurableModule
           }
         }
 
-        #$this->pages->addHookBefore("delete", $this, "ldapHelperDeleteUser");
-        #$this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');*/
-        $this->addHookAfter('ProcessTemplate::buildEditForm', $this, 'hookBuildEditForm');
+        $this->addHook('Pages::saved', $this, "hookPageSave");
+        #$this->addHook('Pages::saveModuleConfigData', $this, 'hookPageDelete');
     }
 
-    public function hookPageSave(){
+    public function hookPageSave(HookEvent $event){
+      $page = $event->arguments[0];
 
+      // Sample condition and changes
+      // if this isn't a post, don't continue
+      if($page->template != 'node' || !$page->id) return;
+
+      // if this post wasn't made by an "author" don't continue
+      if(!$page->createdUser->hasRole('author')) return;
+
+      $subject = '';
+      $message = '';
+
+      if($page->isChanged('publish_status') || $page->isChanged('editor_notes')) {
+        // the publish status or editor notes have changed
+        $subject = "[FFMYK] Artikelstatus wurde geändert";
+        $notes = $page->isChanged('editor_notes') ? "Notes: $page->editor_notes" : "";
+        $message = "
+          Title: $page->title\n
+          URL: $page->httpUrl\n
+          Status: {$page->publish_status->title}\n
+          $notes
+          ";
+
+      } else if($page->isChanged('status') && !$page->is(Page::statusUnpublished)) {
+        // page was just published
+        $subject = "[FFMYK] Artikel wurde veröfentlicht";
+        $message = "Der Artikel $page->httpUrl wurde soeben veröfentlicht!";
+      }
+
+      if($message) {
+        $reviewer = wire('users')->get('kreativmonkey');
+        //$reviewer2 = wire('users')->get('a');
+        $author = $page->createdUser;
+        $headers = 'From: info@mta-r.de' . "\r\n" .
+                   'Reply-To: kontakt@mta-r.de' . "\r\n" .
+                   'X-Mailer: PHP/' . phpversion();
+        mail("$reviewer->email, $author->email", $subject, $message, $headers);
+        $this->message("E-Mail versendet: $subject");
+      }
     }
     public function hookPageDelete(){
 
@@ -61,141 +98,6 @@ class mailNotification extends WireData implements Module, ConfigurableModule
     }
     public function sendMail($message){
 
-    }
-
-    /**
-     * Hook into the main form build for template edit
-     * found in line 565 on /wire/modules/Process/ProcessTemplate/ProcessTemplate.module
-     *
-     */
-    protected function hookBuildEditForm(HookEvent $event) {
-      $process = $event->template;
-
-      /*$t = new InputfieldWrapper();
-  		$t->attr('title', $this->_x('Notification', 'tab'));
-  		$t->attr('class', 'WireTab');
-  		$this->buildEditFormNotification($template, $t);
-  		$form->add($t);*/
-    }
-
-    /**
-     *
-     *
-     */
-    protected function buildEditFormNotification(Template $template, InputfieldWrapper $t){
-      $form = new InputfieldWrapper();
-  		$form->attr('id', 'urls');
-
-  		// --------------------
-
-  		$moreLabel = $this->_('More');
-
-  		$field = $this->modules->get('InputfieldCheckbox');
-  		$field->attr('id+name', 'allowPageNum');
-  		$field->label = $this->_('Allow Page Numbers?');
-  		$field->icon = 'list-ol';
-  		$field->attr('value', 1);
-  		if($template->allowPageNum) $field->attr('checked', 'checked');
-  			else $field->collapsed = Inputfield::collapsedYes;
-  		$field->description = $this->_('If checked, pages using this template will support pagination.');
-  		$field->description .= " [$moreLabel](https://processwire.com/docs/admin/setup/templates/#allow-page-numbers)";
-  		$field->columnWidth = 50;
-  		//$field->notes = $this->_('Access the current page number from your template files with $input->pageNum.'); // Allow page numbers, API notes
-  		$form->append($field);
-  		if($template->allowPageNum) $form->collapsed = Inputfield::collapsedNo;
-
-  		$field = $this->modules->get('InputfieldRadios');
-  		$field->attr('id+name', 'slashPageNum');
-  		$field->label = $this->_('Should page number URLs have a trailing slash?');
-  		$field->icon = 'list-ol';
-  		$field->addOption(1, $this->labels['Yes']);
-  		$field->addOption(-1, $this->labels['No']);
-  		$field->addOption(0, $this->labels['Either']);
-  		$field->attr('value', (int) $template->slashPageNum);
-  		$field->showIf = 'allowPageNum=1';
-  		$field->columnWidth = 50;
-  		$form->append($field);
-
-  		// --------------------
-
-  		$field = $this->modules->get('InputfieldCheckbox');
-  		$field->attr('name', 'urlSegments');
-  		$field->label = $this->_('Allow URL Segments?');
-  		$field->icon = 'sitemap';
-  		$field->columnWidth = 50;
-  		$field->description = $this->_('If checked, pages using this template will support custom URL segments after the page URL.') . ' ';
-  		$field->description .= "[$moreLabel](https://processwire.com/docs/admin/setup/templates/#allow-url-segments)";
-  		//$field->notes = $this->_('Access the current URL segment(s) from your template files with $input->urlSegmentStr.'); // Allow page numbers, API notes
-  		//$field->notes .= " [$moreLabel](https://processwire.com/docs/admin/setup/templates/#accessing-url-segments-from-the-api)";
-
-  		$field->attr('value', 1);
-  		$urlSegments = $template->urlSegments();
-  		if($urlSegments) {
-  			$field->attr('checked', 'checked');
-  			$form->collapsed = Inputfield::collapsedNo;
-  		} else {
-  			$field->collapsed = Inputfield::collapsedYes;
-  		}
-  		$form->append($field);
-
-  		$field = $this->modules->get('InputfieldRadios');
-  		$field->attr('id+name', 'slashUrlSegments');
-  		$field->label = $this->_('Should URL segments end with a trailing slash?');
-  		$field->icon = 'sitemap';
-  		$field->addOption(1, $this->labels['Yes']);
-  		$field->addOption(-1, $this->labels['No']);
-  		$field->addOption(0, $this->labels['Either']);
-  		$field->attr('value', (int) $template->slashUrlSegments);
-  		$field->showIf = 'urlSegments=1';
-  		$field->columnWidth = 50;
-  		$form->append($field);
-
-  		$field = $this->modules->get('InputfieldTextarea');
-  		$field->attr('name', 'urlSegmentsList');
-  		$field->label = $this->_('Which URL segments do you want to allow?');
-  		$field->description = $this->_('Enter one allowed segment, segment path or regular expression per line, or leave blank to allow any.'); // Description for allow URL segments
-  		$field->description .= " [$moreLabel](https://processwire.com/docs/admin/setup/templates/#which-url-segments-do-you-want-to-allow)";
-  		$field->icon = 'sitemap';
-  		if(is_array($urlSegments)) $field->attr('value', implode("\n", $urlSegments));
-  		$field->showIf = 'urlSegments=1';
-  		$field->collapsed = Inputfield::collapsedBlank;
-  		$form->append($field);
-
-  		// --------------------
-
-  		$field = $this->modules->get('InputfieldRadios');
-  		$field->attr('name', 'slashUrls');
-  		$field->label = $this->_('Should page URLs end with a slash?');
-  		$field->addOption(1, $this->labels['Yes']);
-  		if($template->name != 'admin') $field->addOption(0, $this->labels['No']);
-  		$field->description = $this->_("If 'Yes', pages using this template will always have URLs that end with a trailing slash '/'. And if the page is loaded from a URL without the slash, it will be redirected to it. If you select 'No', the non-slashed version will be enforced instead. Note that this setting does not enforce this behavior on URL segments or page numbers, only actual page URLs. If you don't have a preference, it is recommended that you leave this set to 'Yes'."); // URLs end with slash, description
-  		$field->attr('value', $template->slashUrls === 0 ? 0 : 1); // force default setting of 1
-  		$field->collapsed = $template->slashUrls === 0 ? Inputfield::collapsedNo : Inputfield::collapsedYes;
-  		if($template->slashUrls === 0) $form->collapsed = Inputfield::collapsedNo;
-  		$form->append($field);
-
-  		// --------------------
-
-  		$field = $this->modules->get('InputfieldRadios');
-  		$field->attr('name', 'https');
-  		$field->label = $this->_('Scheme/Protocol');
-  		$field->addOption(0, $this->_('HTTP or HTTPS'));
-  		$field->addOption(1, $this->_('HTTPS only (SSL encrypted)'));
-  		$field->addOption(-1, $this->_('HTTP only'));
-  		$field->collapsed = Inputfield::collapsedBlank;
-  		$field->description = $this->_("If your site has an SSL certificate and is accessible by HTTPS, you may make pages using this template accessible only via HTTPS or HTTP. For example, if you select 'HTTPS only' below, and a request for a page using this template comes in through HTTP, it will be automatically redirected to the HTTPS version. By default, ProcessWire allows connection from either HTTP or HTTPS."); // Scheme/Protocol, description
-  		$field->attr('value', (int) $template->https);
-  		$form->append($field);
-  		if($template->https) $form->collapsed = Inputfield::collapsedNo;
-
-  		return $form;
-    }
-
-    /**
-  	 * Save the template and check to see if a Fieldgroup change was requested
-  	 *
-  	 */
-  	protected function ___executeSave() {
     }
 
     public function hookModuleSave(HookEvent $event) {
