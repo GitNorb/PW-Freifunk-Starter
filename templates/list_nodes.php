@@ -17,7 +17,7 @@ if($input->urlSegment1){
                   <td>$node->latitude</td>
                   <td>$node->longitude</td>
                   <td>$node->online</td>
-                  <td>{$node->parent->title}</td>
+                  <td>{$users->get($n->operator)->name}</td>
                 </tr>";
       }
 
@@ -28,7 +28,7 @@ if($input->urlSegment1){
       break;
     case 'add':
       if(!wire('user')->isLoggedin()){
-        $content = "Pleas Login or Registrat";
+        $content = "<article><h2>Gesicherte Seite</h2>Bitte Anmelden oder Registrieren.</article>";
         $session->redirectUrl = $page->path."add/";
         if(isset($input->get->mac)) $session->mac = $input->get->mac;
         if(isset($input->get->key)) $session->key = $input->get->key;
@@ -39,18 +39,19 @@ if($input->urlSegment1){
       } else {
         //  Register Node
         $user = wire('user')->name;
-        $parent = $pages->get("template=node_operator, title|name=$user");
-        if($parent instanceof Nullpage) $parent = createPage('node_operator', 'node', $user);
+        $parent = $pages->get($page->id);
+        $operator = wire('user')->id;
         if($pages->get("title={$input->post->mac}") instanceof Nullpage){
           // Add new if not exist
           $n = createPage('node', $parent, $input->post->mac);
           $n->key = $input->post->key;
+          $n->operator = $operator;
           $n->save();
         } else {
           // Update if exit
+          $operator = wire('user')->id;
           $n = $pages->get("title={$input->post->mac}");
-          $n->parent = $parent;
-          $n->createdUser = wire('user')->id;
+          $n->operator = $operator;
           $n->key = $input->post->key;
           $n->of(false);
           $n->save();
@@ -61,7 +62,7 @@ if($input->urlSegment1){
                     <p>
                     Titel: {$n->title}<br>
                     Key : {$n->key}<br>
-                    Benutzer: {$n->parent->title}
+                    Benutzer: {$users->get($n->operator)->name}
                     </p>";
         $session->remove('key');
         $session->remove('mac');
@@ -83,9 +84,8 @@ if($input->urlSegment1){
   }
 
 } else {
-  $user = wire('user')->name;
-  $parent = $pages->get("template=node_operator, title|name=$user");
-  $nodes = $pages->find("parent=$parent, template=node, sort=-subtitle");
+  $user = wire('user')->id;
+  $nodes = $pages->find("operator=$user, template=node, sort=-subtitle");
   $table = '';
 
   foreach($nodes as $node){
@@ -98,7 +98,7 @@ if($input->urlSegment1){
               <td>$node->latitude</td>
               <td>$node->longitude</td>
               <td>$online</td>
-              <td>{$node->parent->title}</td>
+              <td>{$users->get($n->operator)->name}</td>
             </tr>";
   }
 
