@@ -69,6 +69,7 @@ if($input->urlSegment1){
       }
       break;
       case 'keys':
+          if(!autorized($input->secret)) throw new Wire404Exception();
           $useMain = false;
           $nodes = $pages->find("template=node, key!=''");
           $router = array();

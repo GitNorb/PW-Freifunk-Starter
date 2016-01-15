@@ -328,6 +328,15 @@ function createPage($template, $parent, $page){
 
 	return $t;
 }
+#################################################
+# secret
+#################################################
+function autorized($secret){
+  $pages = wire('pages');
+  $secrets = $pages->get("secret=$secret, template=supernode");
+  if($secrets instanceof NullPage) return false;
+  return true;
+}
 
 #################################################
 # Hooks
