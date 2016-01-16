@@ -43,7 +43,8 @@ if($input->urlSegment1){
         $operator = wire('user')->id;
         if($pages->get("title={$input->post->mac}") instanceof Nullpage){
           // Add new if not exist
-          $n = createPage('node', $parent, $input->post->mac);
+          $mac = strtoupper($input->post->mac);
+          $n = createPage('node', $parent, $mac);
           $n->key = $input->post->key;
           $n->operator = $operator;
           $n->save();
@@ -62,7 +63,7 @@ if($input->urlSegment1){
                     <p>
                     Titel: {$n->title}<br>
                     Key : {$n->key}<br>
-                    Benutzer: {$users->get($n->operator)->name}
+                    Betreiber: {$users->get($n->operator)->name}
                     </p>";
         $session->remove('key');
         $session->remove('mac');

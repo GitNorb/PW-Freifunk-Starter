@@ -48,7 +48,7 @@ function isActive(Page $page, Page $nav){
           <a href="#">Benutzer</a>
           <ul class="dropdown">
             <li>
-              <a href="<?= $pages->get(8544)->httpURL ?>"><i class='fa fa-user'></i> Profil</a>
+              <a href="<?= $pages->get('/profile/')->httpURL ?><?= $user->name ?>"><i class='fa fa-user'></i> Profil</a>
             </li>
             <li>
               <a href="<?= $pages->get("/node/")->httpURL ?>"><i class='fa fa-wifi'></i> Nodes</a>
