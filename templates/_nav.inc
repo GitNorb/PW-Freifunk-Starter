@@ -54,7 +54,7 @@ function isActive(Page $page, Page $nav){
               <a href="<?= $pages->get("/node/")->httpURL ?>"><i class='fa fa-wifi'></i> Nodes</a>
             </li>
             <li>
-              <a href="<?= $pages->get('title|name=lesezeichen')->httpURL ?>"><i class='fa fa-bookmark'></i> Lesezeichen</a>
+              <a href="<?= $pages->get('/service/')->httpURL ?>"><i class='fa fa-server'></i> Dienste</a>
             </li>
             <?php if(wire('user')->hasRole('superuser') || wire('user')->hasRole('manager')){ ?>
               <li>

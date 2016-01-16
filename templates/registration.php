@@ -24,7 +24,6 @@ if($input->post->submit) {
             $new_user->firstname = $nuser["firstname"];
             $new_user->lastname = $nuser["lastname"];
             $new_user->admin_theme = "AdminThemeReno";
-            $new_user->language = 1023;
             $new_user->save();
             $new_user->of(true);
 
