@@ -18,7 +18,12 @@ function isActive(Page $page, Page $nav){
 <nav class="top-bar" data-topbar role="navigation">
   <ul class="title-area">
     <li class="name">
-      <h2><a href="<?=$homepage->httpUrl?>">Freifunk-MYK</a></h2>
+      <h2>
+        <a href="<?=$homepage->httpUrl?>">
+          <?php if($homepage->logo){ ?> <img src="<?php echo $homepage->logo->size(35,35)->url ?>"/> <?php } ?>
+          <?=$homepage->headline?>
+        </a>
+      </h2>
     </li>
     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
     <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
@@ -54,9 +59,9 @@ function isActive(Page $page, Page $nav){
               <a href="<?= $pages->get("/node/")->httpURL ?>"><i class='fa fa-wifi'></i> Nodes</a>
             </li>
             <li>
-              <a href="<?= $pages->get('/service/')->httpURL ?>"><i class='fa fa-server'></i> Dienste</a>
+              <a href="<?= $pages->get('/static-ip/')->httpURL ?>"><i class='fa fa-server'></i> Statische IPs</a>
             </li>
-            <?php if(wire('user')->hasRole('superuser') || wire('user')->hasRole('manager')){ ?>
+            <?php if(wire('user')->hasRole('superuser') || wire('user')->hasRole('admin') || wire('user')->hasRole('manager')){ ?>
               <li>
                 <a href="<?=$pages->get(1)->httpUrl?>processwire"><i class='fa fa-cogs'></i> Admin</a>
               </li>
