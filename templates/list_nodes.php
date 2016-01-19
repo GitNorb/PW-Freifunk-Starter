@@ -1,4 +1,47 @@
 <?php
+function registerNode($mac, $key){
+  if(empty($mac) || empty($key)) return;
+
+  $page = wire('page');
+  $node = wire('pages')->get("template=node, title=$mac");
+  $parent = wire('pages')->get($page->id);
+  $operator = wire('user')->id;
+
+  // Check some part of node
+  if($node instanceof Nullpage){
+    $titlemac = strtoupper($mac);
+    $n = createPage('node', $parent, $titlemac);
+    $title = "<h2>Node hinzugefügt:</h2>";
+  } elseif($node->operator->id != $operator) {
+    // Checke ob der Node vom Besitzer geändert wird.
+    $content = "<h2>Node nicht Hinzugefügt</h2>
+                <p>
+                Der Node ist auf einen anderen User registriert. Um ihn registrieren zu können muss der alte Besitzer den Node aus seinem Profil löschen.
+                </p>";
+    return $content;
+  } else {
+    $n = $node;
+    $title = "<h2>Node aktualisiert:</h2>";
+  }
+
+  $n->key = $key;
+  $n->operator = $operator;
+  $n->of(false);
+  $n->save();
+  $n->of(true);
+
+  $content = "$title
+              <p>
+              Titel: {$n->title}<br>
+              Key : {$n->key}<br>
+              Betreiber: {$n->operator->name}
+              </p>";
+
+  wire('session')->remove('key');
+  wire('session')->remove('mac');
+
+  return $content;
+}
 
 if($input->urlSegment2) throw new Wire404Exception();
 
@@ -17,7 +60,7 @@ if($input->urlSegment1){
                   <td>$node->latitude</td>
                   <td>$node->longitude</td>
                   <td>$node->online</td>
-                  <td>{$users->get($n->operator)->name}</td>
+                  <td>{$node->operator->name}</td>
                 </tr>";
       }
 
@@ -27,6 +70,7 @@ if($input->urlSegment1){
     case 'map':
       break;
     case 'add':
+      // Check if user is logged in and save the input->get in the session variable.
       if(!wire('user')->isLoggedin()){
         $content = "<article><h2>Gesicherte Seite</h2>Bitte Anmelden oder Registrieren.</article>";
         $session->redirectUrl = $page->path."add/";
@@ -38,35 +82,7 @@ if($input->urlSegment1){
         $content = renderPage('node_registration');
       } else {
         //  Register Node
-        $user = wire('user')->name;
-        $parent = $pages->get($page->id);
-        $operator = wire('user')->id;
-        if($pages->get("title={$input->post->mac}") instanceof Nullpage){
-          // Add new if not exist
-          $mac = strtoupper($input->post->mac);
-          $n = createPage('node', $parent, $mac);
-          $n->key = $input->post->key;
-          $n->operator = $operator;
-          $n->save();
-        } else {
-          // Update if exit
-          $operator = wire('user')->id;
-          $n = $pages->get("title={$input->post->mac}");
-          $n->operator = $operator;
-          $n->key = $input->post->key;
-          $n->of(false);
-          $n->save();
-          $n->of(true);
-        }
-
-      	$content = "<h2>Node Hinzugefügt:</h2>
-                    <p>
-                    Titel: {$n->title}<br>
-                    Key : {$n->key}<br>
-                    Betreiber: {$users->get($n->operator)->name}
-                    </p>";
-        $session->remove('key');
-        $session->remove('mac');
+        $content = registerNode($input->post->mac, $input->post->key);
       }
       break;
       case 'keys':
@@ -100,7 +116,7 @@ if($input->urlSegment1){
               <td>$node->latitude</td>
               <td>$node->longitude</td>
               <td>$online</td>
-              <td>{$users->get($n->operator)->name}</td>
+              <td>{$node->operator->name}</td>
             </tr>";
   }
 
