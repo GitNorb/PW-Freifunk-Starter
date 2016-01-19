@@ -23,16 +23,15 @@ foreach($nodes as $node){
 $page->nodes = ( empty($nodes) ? false : $table_nodes );
 
 
-$services = $pages->find("template=service, operator={$u->id}");
-foreach($services as $service){
-  if(empty($service->static_ip)) $service->static_ip = "in Bearbeitung";
+$ips = $pages->find("template=staticip, operator={$u->id}");
+foreach($ips as $ip){
   $table_service .="<tr class='$status'>
-            <td>$service->subtitle</td>
-            <td>$service->title</td>
-            <td>$service->static_ip</td>
+            <td>$ip->subtitle</td>
+            <td>$ip->title</td>
+            <td>$ip->static_ip</td>
           </tr>";
 }
-$page->services = ( empty($services) ? false : $table_service );
+$page->ips = ( empty($ips) ? false : $table_service );
 
 $userlist = $users->find("start=0");
 foreach($userlist as $uli){
