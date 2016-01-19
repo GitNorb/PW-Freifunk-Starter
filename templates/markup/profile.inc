@@ -26,7 +26,7 @@
       </p>
   <?php } ?>
 
-  <h2>Dienste <?php if($page->userID == $user->id){ ?><a title="Service registrieren" href="<?=$pages->get('/service/')->httpUrl?>add"><i class='fa fa-plus-circle'></i></a> <?php }; ?></h2>
+  <h2>Statische IPs <?php if($page->userID == $user->id){ ?><a title="Service registrieren" href="<?=$pages->get('/service/')->httpUrl?>add"><i class='fa fa-plus-circle'></i></a> <?php }; ?></h2>
   <?php if ($page->nodes != false){ ?>
   <table class='node-list'>
     <thead>
@@ -37,12 +37,12 @@
       </tr>
     </thead>
     <tbody>
-      <?=$page->services?>
+      <?=$page->ips?>
     </tbody>
   </table>
   <?php } elseif($page->userID == $user->id) { ?>
     <p>
-      Derzeit sind keine Services eingetragen. Du kannst einen Service <a href="<?=$pages->get("/service/")->httpUrl?>add">registrieren</a>.
+      Derzeit sind keine Services eingetragen. Du kannst einen Service <a href="<?=$pages->get("/static-ip/")->httpUrl?>add">registrieren</a>.
     </p>
   <?php } else { ?>
       <p>
