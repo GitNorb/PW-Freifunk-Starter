@@ -8,7 +8,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
     public static function getModuleInfo() {
         return array(
             'title' => __('LDAP Helper'),
-            'version' => '003',
+            'version' => '004',
             'author' => 'Kreativmonkey',
             'summary' => __('Hendle LDAP Communication for Processwire'),
             'singular' => true,
@@ -116,19 +116,26 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       $username = $event->arguments[0];
       $password = $event->arguments[1];
 
-      if($bind = $this->ldapHelperBind($username, $password)){
+      if(!$con = $this->ldapHelperConnect()) return; // Connection Failed
+      $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$username))");
+      $user_entry = ldap_first_entry($con, $user_search);
+      $user_dn = ldap_get_dn($con, $user_entry);
+
+      if(ldap_bind($con, $user_dn, $password)){
         $wireUserName = $this->sanitizer->pageName($username);
 
         $user = $this->users->get("name=$wireUserName");
         if($user instanceof NullPage){
           // Search the LDAP Entry
+          $first_name = ldap_get_values($con, $user_entry, "cn");
+          $last_name = ldap_get_values($con, $user_entry, "sn");
 
           // Add ldap user to ProcessWire
           $new_user = new User();
           $new_user->of(false);
           $new_user->name = $wireUserName;
-          #$new_user->firstname = $info["cn"];
-          #$new_user->lastname = $info["sn"];
+          $new_user->firstname = $first_name;
+          $new_user->lastname = $last_name;
           $new_user->pass = $password;
           $new_user->addRole("user");
           $new_user->admin_theme = "AdminThemeReno";
@@ -137,7 +144,10 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         } else {
           // Set new Password
           $user->pass = $password;
-          if($user->isChanged('pass')) $user->save();
+          if($user->isChanged('pass')){
+             $user->save();
+             $this->message($this->_('Password changed success.'));
+           }
         }
 
         $user = $this->session->login($wireUserName, $password);
@@ -151,12 +161,6 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       }
     }
 
-    public function ldapHelperBind($username, $password){
-      $connect = $this->ldapHelperConnect();
-      $bind = @ldap_bind($connect, "uid=$username,ou=People,dc=ffmyk,dc=de", $password);
-      return $bind;
-    }
-
     public function ldapHelperDeleteUser(HookEvent $event) {
         $page = $event->arguments("page");
 
@@ -167,16 +171,19 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $connect = $this->ldapHelperConnect();
         $r= $this->ldapHelperWrite($connect);
 
+        $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$user))");
+        $user_entry = ldap_first_entry($con, $user_search);
+
         // Delete User from LDAP
-        $dn= "uid=$username,ou=People,dc=ffmyk,dc=de";
-        if(ldap_delete( $connect , $dn )){ // Return true or false
-          $massage = ldap_err2str(ldap_errno($connect));
+        $dn= ldap_get_dn($con, $user_entry);
+        if(ldap_delete( $connect , $dn )){
           $this->message("Delete LDAP User: $username");
           $this->log->save('ldap_helper', "Delete User: $username");
         } else {
-          $massage = ldap_err2str(ldap_errno($connect));
-          $this->message("Delete LDAP User failed $massage");
-          $this->log->save('ldap_helper', "Delete User failed $massage");
+          $errno = ldap_errno($connect); // Error code
+          $error = ldap_error($connect); // Error text
+          $this->message("Delete LDAP User failed $error ($errno)");
+          $this->log->save('ldap_helper', "Delete User failed $error ($errno)");
         }
 
         ldap_close($connect);

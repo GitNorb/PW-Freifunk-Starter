@@ -92,7 +92,7 @@ function isActive(Page $page, Page $nav){
       </div>
       <div >
         <button type="submit" id="btnLogin" name='submit' value='Login' class="btn btn-default">Login</button>
-        <a href="<?php $homepage ?>/registration/"><button type="button" id="btnRegister" class="btn btn-default">Registrieren</button></a>
+        <a href="<?php echo $pages->get("/registration/")->httpUrl; ?>"><button type="button" id="btnRegister" class="btn btn-default">Registrieren</button></a>
       </div>
     </form>
     <a href="<?=$pages->get("template=password-reset")->url?>">Password vergessen?</a>

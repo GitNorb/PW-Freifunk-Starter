@@ -311,22 +311,73 @@ function listPages(PageArray $pages){
  *
  * @param  string $template     the template for the new page
  * @param  Page/string $parent  parent Page can be a Page or string
- * @param  string $page         Title of the new Page
+ * @param  string $title        Title of the new Page
  * @return PageArray            The new Page
  */
-function createPage($template, $parent, $page){
+function createPage($template, $parent, $title){
 	if(!$parent instanceof Page) $parent = wire('pages')->get("/$parent/"); // Wenn keine Seite übergeben wird suche eine raus.
 
-	$pageName = renderPageName($page);
+	$pageName = renderPageName($title);
 
 	$t = new Page();
 	$t->template = $template;
 	$t->parent = $parent;
 	$t->name = $pageName;
-	$t->title = $page;
+	$t->title = $title;
 	$t->save();
 
 	return $t;
+}
+
+/**
+ * Fucntion to handle Node registration
+ *
+ * @param string $mac     the MAC Address from the Node
+ * @param string $key     the Node PublicKey for the VPN connection_status
+ * @return string         the Output String to Display the Information of register Node
+ */
+function registerNode($mac, $key){
+  if(empty($mac) || empty($key)) return;
+
+  $page = wire('page');
+  $node = wire('pages')->get("template=node, title=$mac");
+  $parent = wire('pages')->get($page->id);
+  $operator = wire('user')->id;
+
+  // Check some part of node
+  if($node instanceof Nullpage){
+    $titlemac = strtoupper($mac);
+    $n = createPage('node', $parent, $titlemac);
+    $title = "<h2>Node hinzugefügt:</h2>";
+  } elseif($node->operator->id != $operator) {
+    // Checke ob der Node vom Besitzer geändert wird.
+    $content = "<h2>Node nicht Hinzugefügt</h2>
+                <p>
+                Der Node ist auf einen anderen User registriert. Um ihn registrieren zu können muss der alte Besitzer den Node aus seinem Profil löschen.
+                </p>";
+    return $content;
+  } else {
+    $n = $node;
+    $title = "<h2>Node aktualisiert:</h2>";
+  }
+
+  $n->key = $key;
+  $n->operator = $operator;
+  $n->of(false);
+  $n->save();
+  $n->of(true);
+
+  $content = "$title
+              <p>
+              Titel: {$n->title}<br>
+              Key : {$n->key}<br>
+              Betreiber: {$n->operator->name}
+              </p>";
+
+  wire('session')->remove('key');
+  wire('session')->remove('mac');
+
+  return $content;
 }
 #################################################
 # secret
@@ -343,3 +394,59 @@ function autorized($secret){
 #################################################
 
 wire()->addHook('LazyCron::every2Minutes', null, 'setNodeInfo');
+
+class jsonparser {
+        private $src = 'http://status.freifunk-myk.de/nodedata/nodes.json';
+
+        private $cache = false;
+        private $cache_node = array();
+
+        function __construct() {
+            $htmlcache = file_get_contents($this->src);
+            $this->cache = json_decode($htmlcache);
+            $this->gen_nodecache();
+        }
+
+        function gen_nodecache() {
+            foreach($this->cache->nodes as $node) {
+                $this->cache_node[base64_encode(strtoupper($node->nodeinfo->node_id))] = $node;
+            }
+            $this->cache=false;
+        }
+
+        function get_nodeinfo($mac) {
+            $mac = strtoupper(str_replace(':', '', $mac));
+            $data = array(
+                'addresses' => array(''),
+                'hardware' => 'unbekannt',
+                'firmware' => 'unbekannt',
+                //'autoupdater_state' => false,
+                'name' => 'unbekannt',
+                'lastseen' => 0,
+                'geo' => array(0,0),
+                'ip' => ''
+            );
+
+            if(!isset($this->cache_node[base64_encode($mac)])) return $data;
+            $info = $this->cache_node[base64_encode($mac)];
+
+            $ip = '';
+            if(isset($info->nodeinfo->network->addresses)) {
+                foreach($info->nodeinfo->network->addresses as $tip) {
+                    if(substr($tip, 0, 4) == '2a01') $ip = $tip;
+                }
+            }
+
+            $data = array(
+                'addresses' => $info->nodeinfo->network->addresses,
+                'hardware' => $info->nodeinfo->hardware->model,
+                'firmware' => $info->nodeinfo->software->firmware->release,
+                'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
+                'name' => $info->nodeinfo->hostname,
+                'lastseen' => $info->lastseen,
+                'geo' => $info->nodeinfo->location,
+                'ip' => $ip
+            );
+            return $data;
+        }
+    }
