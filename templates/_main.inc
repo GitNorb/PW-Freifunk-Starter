@@ -96,7 +96,8 @@ if(!wire('user')->isLoggedin()){
     echo ($page->id === 1 ? $content :   '<div id="content" class="row">'.$content.'</div>');
     ?>
   </section>
-
+<section>
+</section>
   <footer class="footer">
     <div class="row">
       <div class="small-12 medium-4 medium-push-8 columns">

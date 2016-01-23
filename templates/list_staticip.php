@@ -14,7 +14,7 @@ if($input->urlSegment1){
         $table .="<tr class='$status'>
                   <td>$service->subtitle</td>
                   <td>$service->static_ip</td>
-                  <td>{$users->get($n->operator)->name}</td>
+                  <td><a href='{$pages->get('/profile/')->httpUrl}{$service->operator->name}'>{$service->operator->name}</a></td>
                 </tr>";
       }
 
@@ -85,7 +85,7 @@ if($input->urlSegment1){
     $table .="<tr class='$status'>
               <td>$service->subtitle</td>
               <td>$service->static_ip</td>
-              <td>{$users->get($n->operator)->name}</td>
+              <td>{$service->operator->name}</td>
             </tr>";
   }
 

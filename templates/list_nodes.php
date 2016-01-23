@@ -16,7 +16,7 @@ if($input->urlSegment1){
                   <td>$node->latitude</td>
                   <td>$node->longitude</td>
                   <td>$node->online</td>
-                  <td>{$node->operator->name}</td>
+                  <td><a href='{$pages->get('/profile/')->httpUrl}{$node->operator->name}'>{$node->operator->name}</a></td>
                 </tr>";
       }
 
