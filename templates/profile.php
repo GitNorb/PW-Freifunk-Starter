@@ -40,24 +40,10 @@ $page->userID = $u->id;
 if($user instanceof NullPage) throw new Wire404Exception();
 
 // Nodes
-$nodes = $pages->find("template=node, operator={$u->id}");
-
-$table_nodes = makeTable($nodes, array("Name"  => "subtitle",
-                                        "MAC"   => "title",
-                                        "Latitude" => "latitude",
-                                        "Longitude" => "longitude",
-                                        "Status" => "online"), true);
-
-$page->nodes = ( empty($nodes) ? false : $table_nodes );
+$page->nodes = $pages->find("template=node, operator={$u->id}");
 
 // IPs
-$ips = $pages->find("template=staticip, operator={$u->id}");
-
-$table_id = makeTable($ips, array("Bezeichnung" => "subtitle",
-                                  "MAC" => "title",
-                                  "IP" => "static_ip"));
-
-$page->ips = ( empty($ips) ? false : $table_id );
+$page->ips = $pages->find("template=staticip, operator={$u->id}");
 
 $userlist = $users->find("start=0");
 foreach($userlist as $uli){
