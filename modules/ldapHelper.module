@@ -8,7 +8,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
     public static function getModuleInfo() {
         return array(
             'title' => __('LDAP Helper'),
-            'version' => '004',
+            'version' => '005',
             'author' => 'Kreativmonkey',
             'summary' => __('Hendle LDAP Communication for Processwire'),
             'singular' => true,
@@ -67,6 +67,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $this->pages->addHookBefore("delete", $this, "ldapHelperDeleteUser");
         $this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
         $this->session->addHookAfter('login', $this, 'ldapHelperLogin');
+        $this->addHookBefore("Password::setPassword", $this, 'ldapHelperChangePw');
     }
 
     public function ldapHelperRegistradeUser(Array $user) {
@@ -160,6 +161,51 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $this->message("Bitte Registriere dich.");
       }
     }
+
+    protected function ldapHelperChangePw(HookEvent $event) {
+        $return = $event->arguments[0];
+
+        $this->message("Password: $return");
+
+        /*$page = $event->arguments[0];
+        $user = wire('user');
+        $users = wire('users');
+
+        $this->message("Page Save");
+        if($page->template != 'user' || !$page->id) return;
+
+
+        foreach($event->arguments[1] as $key => $argument){
+          $this->message("$key: $argument");
+        }
+
+        $this->message("$message");
+
+        if($page->isChanged('pass'))
+          $page->of(false);
+          $this->message("Password Changed to {$page->pass}");
+          $page->of(true); */
+
+        /*if(!$con = $this->ldapHelperConnect()) return;
+
+        $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$user))");
+        $user_get = ldap_get_entries($con, $user_search);
+        $user_entry = ldap_first_entry($con, $user_search);
+        $user_dn = ldap_get_dn($con, $user_entry);
+
+        $entry = array();
+        $entry["userPassword"] = $this->makeSshaPassword($pw_new);
+
+        if(ldap_bind($con, $user_dn, $pw_old) === false){
+            $message = "Error E101 - Current Username or Password is wrong.";
+            return false;
+        }
+        if(ldap_modify($con,$user_dn,$entry) === false){
+            $error = ldap_error($con);
+            $errno = ldap_errno($con);
+            $message = "$errno - $error";
+        }*/
+      }
 
     public function ldapHelperDeleteUser(HookEvent $event) {
         $page = $event->arguments("page");
