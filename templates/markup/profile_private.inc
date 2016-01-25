@@ -1,3 +1,6 @@
+<div id="sidebar" class="large-12 columns">
+
+</div>
 <article id='article' class='medium-9 small-12 columns'>
   <h1><?=$page->title?></h1>
 
@@ -27,6 +30,3 @@
   ?>
 
 </article>
-<div id="sidebar" class="medium-3 small-12 columns">
-  <?=$page->userlist?>
-</div>

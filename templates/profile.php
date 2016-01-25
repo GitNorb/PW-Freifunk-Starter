@@ -45,10 +45,5 @@ $page->nodes = $pages->find("template=node, operator={$u->id}");
 // IPs
 $page->ips = $pages->find("template=staticip, operator={$u->id}");
 
-$userlist = $users->find("start=0");
-foreach($userlist as $uli){
-  $liste .= "<li><a href='{$pages->get('/profile/')->httpUrl}{$uli->name}'>$uli->name</a></li>";
-}
-$page->userlist = "<ul>$liste</ul>";
 
 $content = ($user->id === $u->id ? renderPage('profile_private') : renderPage());
