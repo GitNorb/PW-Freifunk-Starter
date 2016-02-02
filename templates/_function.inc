@@ -69,7 +69,7 @@ function setNodeInfo(){
     $p->latitude = $node['position']['lat'];
     $p->longitude = $node['position']['long'];
     $p->online = $node['status']['online'];
-    $p->lastconnection = strtotime($node['status']['lastcontact']);
+    $p->lastseen = strtotime($node['status']['lastcontact']);
     $p->save();
     $p->of(true);
   }
