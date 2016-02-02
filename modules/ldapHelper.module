@@ -39,11 +39,9 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
         if (isset ($this->data ['loginDomain']))
             $this->defaultLoginDomain = $this->data ['loginDomain'];
-        $this->userDefaultRoles = new WireArray ();
 
         if (isset ($this->data ['admin']))
             $this->admin = $this->data ['admin'];
-        $this->userDefaultRoles = new WireArray ();
 
         if (isset ($this->data ['secret']))
             $this->secret = $this->data ['secret'];
@@ -54,6 +52,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         if (isset ($this->data ['ldapSetting']))
             $this->ldapSetting = $this->data ['ldapSetting'];
 
+        $this->userDefaultRoles = new WireArray ();
         if (isset ($this->data ['userDefaultRoles'])) {
             foreach ($this->data ['userDefaultRoles'] as $x) {
                 $role = $this->roles->get($x);
