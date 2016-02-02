@@ -50,31 +50,6 @@ function getTag(PageArray $tags, $limit = 0){
   return $list;
 }
 
-#########################################################
-# setter
-#########################################################
-function setNodeInfo(){
-  $file = file_get_contents('http://ffmyk.niyawe.de/status/data/nodelist.json');
-
-  $data = json_decode($file, true);
-
-  foreach($data['nodes'] as $node){
-    $title = preg_replace('/(.{2})(.{2})(.{2})(.{2})(.{2})(.{2})/', "$1-$2-$3-$4-$5-$6", $node['id']);
-    $p = wire('pages')->get("template=node, title|name=$title");
-
-    if($p instanceof NullPage) continue;
-
-    $p->of(false);
-    $p->subtitle = $node['name'];
-    $p->latitude = $node['position']['lat'];
-    $p->longitude = $node['position']['long'];
-    $p->online = $node['status']['online'];
-    $p->lastseen = strtotime($node['status']['lastcontact']);
-    $p->save();
-    $p->of(true);
-  }
-}
-
 ###################################################
 # Render
 ####################################################
@@ -387,65 +362,3 @@ function autorized($secret){
   if($secrets instanceof NullPage) return false;
   return true;
 }
-
-#################################################
-# Hooks
-#################################################
-
-wire()->addHook('LazyCron::every2Minutes', null, 'setNodeInfo');
-
-class jsonparser {
-        private $src = 'http://status.freifunk-myk.de/nodedata/nodes.json';
-
-        private $cache = false;
-        private $cache_node = array();
-
-        function __construct() {
-            $htmlcache = file_get_contents($this->src);
-            $this->cache = json_decode($htmlcache);
-            $this->gen_nodecache();
-        }
-
-        function gen_nodecache() {
-            foreach($this->cache->nodes as $node) {
-                $this->cache_node[base64_encode(strtoupper($node->nodeinfo->node_id))] = $node;
-            }
-            $this->cache=false;
-        }
-
-        function get_nodeinfo($mac) {
-            $mac = strtoupper(str_replace(':', '', $mac));
-            $data = array(
-                'addresses' => array(''),
-                'hardware' => 'unbekannt',
-                'firmware' => 'unbekannt',
-                //'autoupdater_state' => false,
-                'name' => 'unbekannt',
-                'lastseen' => 0,
-                'geo' => array(0,0),
-                'ip' => ''
-            );
-
-            if(!isset($this->cache_node[base64_encode($mac)])) return $data;
-            $info = $this->cache_node[base64_encode($mac)];
-
-            $ip = '';
-            if(isset($info->nodeinfo->network->addresses)) {
-                foreach($info->nodeinfo->network->addresses as $tip) {
-                    if(substr($tip, 0, 4) == '2a01') $ip = $tip;
-                }
-            }
-
-            $data = array(
-                'addresses' => $info->nodeinfo->network->addresses,
-                'hardware' => $info->nodeinfo->hardware->model,
-                'firmware' => $info->nodeinfo->software->firmware->release,
-                'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
-                'name' => $info->nodeinfo->hostname,
-                'lastseen' => $info->lastseen,
-                'geo' => $info->nodeinfo->location,
-                'ip' => $ip
-            );
-            return $data;
-        }
-    }

@@ -126,14 +126,12 @@
           <ul>
             <li>
               Besorge einen Freifunk-fähigen Router. Empfehlungen:
-              <span data-original-title='TP-Link TL-WDR4300, ~70 EUR, 2.4 GHz und 5 GHz.' class='description' data-toggle='tooltip' title=''>TL-WDR4300</span>,
-              <span data-original-title='TP-Link TL-WR842ND, ~30 EUR, nur 2.4 GHz, etwas knappe 32MB RAM.' class='description' data-toggle='tooltip' title=''>TL-WR842ND</span>.
-              Auf weitere Hardware wird in den <a href='https://wiki.freifunk.net/Berlin:Firmware#Kann_ich_den_Router_XYZ.2Fden_alten_Linksys_WRT54G_mit_der_aktuellen_Firmware_benutzen.3F' class='externalLink'>Häufigen Fragen</a> im <a href='../../wiki'>Wiki</a> eingegangen.
+              <span data-original-title='TP-Link TL-WDR4300, ~70 EUR, 2.4 GHz und 5 GHz.' class='description' data-toggle='tooltip' title=''>TL-WR-841N</span>,
+              <span data-original-title='TP-Link TL-WR842ND, ~30 EUR, nur 2.4 GHz, etwas knappe 32MB RAM.' class='description' data-toggle='tooltip' title=''>TL-WDR4300</span>.
             </li>
             <li>
-              Falls du deinen Internet-Zugang freigeben möchtest, solltest du ein paar Tage vor dem
-              Einrichten deines Routers einen Zugang zum <a href='https://wiki.freifunk.net/Vpn03' class='externalLink'>Freifunk-VPN</a>
-              beantragen, um vor Abmahnungen sicher zu sein.
+              Falls du deinen Internet-Zugang freigeben möchtest, musst du deinen VPN Key auf unserer Webseite <a href="<?=$pages->get('/node/')->httpUrl?>add">eintragen</a>.
+              Danach kannst du den Router ans Internet anschließen.
               <!-- TODO: Link (wie komme ich an den account?) -->
             </li>
             <li>

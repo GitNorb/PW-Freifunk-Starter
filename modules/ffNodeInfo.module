@@ -3,97 +3,78 @@
 class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     protected $cache = false;
     protected $cache_node = array();
-    protected $src;
+    protected $src, $nodes;
 
     public static function getModuleInfo() {
         return array(
             'title' => __('FF Node Info'),
             'version' => '001',
             'author' => 'Kreativmonkey',
-            'summary' => __('Update node information'),
+            'summary' => __('Save node information for Freifunk'),
             'singular' => true,
             'autoload' => true
         );
     }
 
     public function ___install() {
-        if (!function_exists('ldap_connect'))
-            throw new WireException ('Please make sure that extension php_ldap is loaded.');
+      // Creating fields and templates for the Node manegemant
     }
 
     public function init() {
-        if (isset ($this->data ['host'])) {
-            $host = explode(':', str_replace(array(
-                'ldap://',
-                'ldaps://'
-            ), array(
-                '',
-                ''
-            ), $this->data ['host']));
-            $this->protocol = (empty ($this->data ['useSSL'])) ? 'ldap://' : 'ldaps://';
-            $this->host = $host [0];
-            $this->port = empty ($host [1]) ? 389 : $host [1];
-        }
+      if (isset ($this->data ['src']))
+          $this->src = $this->data ['src'];
 
-        $this->debugMode = empty ($this->data ['debug']);
-
-        if (isset ($this->data ['loginDomain']))
-            $this->defaultLoginDomain = $this->data ['loginDomain'];
-        $this->userDefaultRoles = new WireArray ();
-
-        if (isset ($this->data ['admin']))
-            $this->admin = $this->data ['admin'];
-        $this->userDefaultRoles = new WireArray ();
-
-        if (isset ($this->data ['secret']))
-            $this->secret = $this->data ['secret'];
-
-        if (isset ($this->data ['useV3']))
-            $this->useV3 = $this->data ['useV3'];
-
-        if (isset ($this->data ['ldapSetting']))
-            $this->ldapSetting = $this->data ['ldapSetting'];
-
-        if (isset ($this->data ['userDefaultRoles'])) {
-            foreach ($this->data ['userDefaultRoles'] as $x) {
-                $role = $this->roles->get($x);
-                $this->userDefaultRoles->add($role);
-            }
-        }
-
-        $this->userDefaultRoles->add($this->roles->getGuestRole());
-        $this->userDefaultRoles = $this->userDefaultRoles->unique();
-
-        $this->pages->addHookBefore("delete", $this, "ldapHelperDeleteUser");
-        $this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
-        $this->session->addHookAfter('login', $this, 'ldapHelperLogin');
+      // run the module every 2 minutes
+      $this->addHook('LazyCron::every2Minutes', $this, 'set_nodeinfo');
     }
 
-    function construct() {
+    protected function cache_data() {
         $htmlcache = file_get_contents($this->src);
         $this->cache = json_decode($htmlcache);
         $this->gen_nodecache();
     }
 
-    function gen_nodecache() {
+    protected function gen_nodecache() {
         foreach($this->cache->nodes as $node) {
             $this->cache_node[base64_encode(strtoupper($node->nodeinfo->node_id))] = $node;
         }
         $this->cache=false;
     }
 
-    function get_nodeinfo($mac) {
+    public function set_nodeinfo(HookEvent $e){
+        $this->cache_data();
+        $nodes = wire('pages')->find("template=node, key!=''");
+
+        foreach($nodes as $node){
+          $data = $this->get_nodeinfo($node->title);
+
+          $node->of(false);
+          if(!empty($data)){
+            // Override exist name only if a new one.
+            if($data['name'] == 'unbekannt' && empty($node->subtitle)){
+              $node->subtitle = $data['name'];
+            } elseif($data['name'] != 'unbekannt') {
+              $node->subtitle = $data['name'];
+            }
+            $node->latitude = $data['geo']['latitude'];
+            $node->longitude = $data['geo']['longitude'];
+            $node->lastseen = strtotime($data['lastseen']);
+            $node->node_hardware = $data['hardware'];
+            $node->node_firmware = $data['firmware'];
+            $node->ipv6 = $data['ip'];
+            $node->online = $data['online'];
+          } else {
+            $node->online = false;
+          }
+
+          $node->save();
+          $node->of(true);
+        }
+    }
+
+    public function get_nodeinfo($mac) {
         $mac = strtoupper(str_replace(':', '', $mac));
-        $data = array(
-            'addresses' => array(''),
-            'hardware' => 'unbekannt',
-            'firmware' => 'unbekannt',
-            'autoupdater_state' => false,
-            'name' => 'unbekannt',
-            'lastseen' => 0,
-            'geo' => array(0,0),
-            'ip' => ''
-        );
+        $data = array();
 
         if(!isset($this->cache_node[base64_encode($mac)])) return $data;
         $info = $this->cache_node[base64_encode($mac)];
@@ -112,21 +93,12 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
             'name' => $info->nodeinfo->hostname,
             'lastseen' => $info->lastseen,
-            'geo' => $info->nodeinfo->location,
-            'ip' => $ip
+            'geo' => array( 'latitude' => $info->nodeinfo->location->latitude,
+                            'longitude' => $info->nodeinfo->location->longitude),
+            'ip' => $ip,
+            'online' => $info->flags->online
         );
         return $data;
-    }
-
-    public function validateConfiguration() {
-        $connection = $this->ldapHelperConnect();
-        if (!$connection) {
-            return;
-        }
-        $this->message($this->_('Successfully connected to LDAP server.'));
-        $bind = $this->ldapHelperWrite($connection);
-        $ldapMessage = ldap_err2str(ldap_errno($connection));
-        $this->message("Bind $ldapMessage");
     }
 
     public function hookModuleSave(HookEvent $event) {
@@ -138,89 +110,15 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     static public function getModuleConfigInputfields(array $data) {
         $inputfields = new InputfieldWrapper ();
 
-        $hostField = wire('modules')->get('InputfieldText');
-        $hostField->name = 'host';
-        $hostField->columnWidth = 80;
-        $hostField->label = __('LDAP Server');
-        $hostField->required = 1;
-        if (isset ($data ['host']))
-            $hostField->value = $data ['host'];
-        $hostField->description = __('The hostname of your LDAP server. This can be either an ip address or a domain name. Supply a custom port (different than 389) separated with a colon. Examples: 10.0.0.1, controller.domain.com, controller.domain.com:388');
-        $inputfields->add($hostField);
-
-        $useSSLField = wire('modules')->get('InputfieldCheckbox');
-        $useSSLField->name = 'useSSL';
-        $useSSLField->columnWidth = 20;
-        $useSSLField->label = __('Use SSL?');
-        $useSSLField->description = __('Connects to the LDAP Server via SSL.');
-        if (isset ($data ['useSSL']) && $data ['useSSL'] == 1)
-            $useSSLField->checked = 1;
-        $inputfields->add($useSSLField);
-
-        $useV3Field = wire('modules')->get('InputfieldCheckbox');
-        $useV3Field->name = 'useV3';
-        $useV3Field->columnWidth = 20;
-        $useV3Field->label = __('Use Protocol V3?');
-        $useV3Field->description = __('Use LDAP Protocol V3.');
-        if (isset ($data ['useV3']) && $data ['useV3'] == 1)
-            $useV3Field->checked = 1;
-        $inputfields->add($useV3Field);
-
-        $defaultLoginDomainField = wire('modules')->get('InputfieldText');
-        $defaultLoginDomainField->name = 'loginDomain';
-        $defaultLoginDomainField->label = __('Default Login Domain');
-        $defaultLoginDomainField->required = 1;
-        if (isset ($data ['loginDomain']))
-            $defaultLoginDomainField->value = $data ['loginDomain'];
-        $defaultLoginDomainField->description = __('This is the domain name used by default if the user does not supply a domain name. It will be added to the username, e.g. username@domainname.com');
-        $inputfields->add($defaultLoginDomainField);
-
-        $adminLoginField = wire('modules')->get('InputfieldText');
-        $adminLoginField->name = 'admin';
-        $adminLoginField->columnWidth = 50;
-        $adminLoginField->label = __('LDAP Admin DN');
-        $adminLoginField->required = 1;
-        if (isset ($data ['admin']))
-            $adminLoginField->value = $data ['admin'];
-        $adminLoginField->description = __('An LDAP account with access to add/edit/delet users. Example: cn=accountmanager,dc=domain,dc=com');
-        $inputfields->add($adminLoginField);
-
-        $secretField = wire('modules')->get('InputfieldText');
-        $secretField->attr ('type','password');
-        $secretField->name = 'secret';
-        $secretField->columnWidth = 50;
-        $secretField->label = __('LDAP Admin Secret');
-        $secretField->description = __('Needet to use with LDAP Admin to add/edit/delete users.');
-        if (isset ($data ['secret']))
-            $secretField->value = $data ['secret'];
-        $inputfields->add($secretField);
-
-        $ldapSettingField = wire('modules')->get('InputfieldTextarea');
-        $ldapSettingField->name = 'ldapSetting';
-        $ldapSettingField->columnWidth = 50;
-        $ldapSettingField->label = __('Entry Setup');
-        $ldapSettingField->description = __('The Entry Setup for LDAP Users. Includes objectClass, uid, cn... one per Line. Set Variables @variable@.');
-        if (isset ($data ['ldapSetting']))
-            $ldapSettingField->value = $data ['ldapSetting'];
-        $inputfields->add($ldapSettingField);
-
-        $userDefaultRolesField = wire('modules')->get('InputfieldPageListSelectMultiple');
-        $userDefaultRolesField->name = 'userDefaultRoles';
-        $userDefaultRolesField->label = __('Default Roles for new Users');
-        $userDefaultRolesField->description = __('These user roles will be applied to all new LDAP users. Please note that the guest role is applied automatically.');
-        $userDefaultRolesField->parent_id = wire('roles')->getGuestRole()->parent_id;
-        if (isset ($data ['userDefaultRoles']))
-            $userDefaultRolesField->value = $data ['userDefaultRoles'];
-        $inputfields->add($userDefaultRolesField);
-
-        $debugField = wire('modules')->get('InputfieldCheckbox');
-        $debugField->name = 'debug';
-        $debugField->collapsed = Inputfield::collapsedYes;
-        $debugField->label = __('Debug Mode');
-        $debugField->description = __('Turns on the debug mode so you can see the output of PHP\'s ldap module in the apache log.');
-        if (isset ($data ['debug']) && $data ['debug'] == 1)
-            $debugField->checked = 1;
-        $inputfields->add($debugField);
+        $srcField = wire('modules')->get('InputfieldText');
+        $srcField->name = 'src';
+        $srcField->columnWidth = 100;
+        $srcField->label = __('JSON URL');
+        $srcField->required = 1;
+        if (isset ($data ['src']))
+            $srcField->value = $data ['src'];
+        $srcField->description = __('The URL to the JSON file with all node data.');
+        $inputfields->add($srcField);
 
         return $inputfields;
     }
