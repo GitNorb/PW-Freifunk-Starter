@@ -70,6 +70,8 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
           $node->save();
           $node->of(true);
         }
+
+        $this->message("Node Informationen aktualisiert");
     }
 
     public function get_nodeinfo($mac) {

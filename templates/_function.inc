@@ -88,59 +88,28 @@ function renderTimeline($timeline){
 
   // Count for the while Schleife
   $count = 0;
-  $output = '';
+  $timeline_blocks = '';
+  $config = wire('config');
 
   foreach($timeline as $post){
-    $title = $post->date;
-    $subheading = $post->title;
-    $summary = $post->summary;
-    $image = $post->images->first();
-    $readmore = $post->httpUrl;
-    $leftright = ($count % 2 != 0 ? "" : "class='timeline-inverted'");
+    $t = new TemplateFile($config->paths->templates . "markup/timeline_block.inc");
+    $t->set('title', $post->date);
+    $t->set('subtitle', $post->title);
+    $t->set('summary', $post->summary);
+    $t->set('image', $post->images->first()->size(156,156)->url);
+    $t->set('image_description', $post->image->description);
+    $t->set('readmore', $post->httpUrl);
+    $t->set('leftright', ($count % 2 != 0 ? "" : "class='timeline-inverted'"));
 
-    $output .= "<li $leftright>
-                  <div class='timeline-image'>
-                    <img class='img-circle img-responsive' src='{$image->size(156,156)->url}' alt='{$image->description}'>
-                  </div>
-                  <div class='timeline-panel'>
-                    <div class='timeline-heading'>
-                      <h4>$title</h4>
-                      <h4 class='subheading'>$subheading</h4>
-                    </div>
-                    <div class='timeline-body'>
-                      <p class='text-muted'>
-                        $summary <a href='{$readmore}'>Weiterlesen</a>
-                      </p>
-                    </div>
-                  </div>
-                </li>";
+    $timeline_blocks .= $t->render();
 
-      $count++;
+    $count++;
   }
 
-  return  "<section id='timeline' data-magellan-destination='timeline' class='info container'>
-                <div class='row'>
-                  <div class='columns large-12 text-center'>
-                    <h2 class='section-heading'>Timeline</h2>
-                    <h3 class='subheader'><small>Unser Weg zum freien Netz.</small></h3>
-                  </div>
-                </div>
-                <div class='row'>
-                  <div class='large-12 columns'>
-                    <ul class='timeline'>
-                      $output
-                      <li class='timeline-inverted'>
-                        <div class='timeline-image'>
-                          <h4>Werde
-                            <br>Teil unserer
-                            <br>Community!</h4>
-                          </div>
-                        </li>
-                      </ul><!-- #timelines -->
-                    </div>
-                  </div>
-                </div>
-              </section><!-- #timeline -->";
+  $t = new TemplateFile($config->paths->templates . "markup/timeline.inc");
+  $t->set('timeline_blocks', $timeline_blocks);
+
+  return $t->render();
 
 }
 
