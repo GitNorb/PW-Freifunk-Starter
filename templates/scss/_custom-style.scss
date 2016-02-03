@@ -134,7 +134,9 @@ $footer-link: true;
     height: 70px;
   }
 }
-
+.background_gray{
+  background-color: darken(#fff, 5%);
+}
 /*------------------------------------
   Custom Router-List
   -----------------------------------*/
