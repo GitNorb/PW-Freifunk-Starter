@@ -322,12 +322,97 @@ function registerNode($mac, $key){
 
   return $content;
 }
+
+function registerUser($u){
+  // inizialisation ldapHelper Module for Ldap Registration
+  $ldapHelper = wire('modules')->get("ldapHelper");
+
+  if(!wire('users')->get($u["username"]) instanceof NullPage) return "<div data-alert class='alert-box alert'>Der Benutzer mit dem Namen {$u["username"]} existiert bereits.</div>";
+  if(!wire('users')->get("email={$u["email"]}") instanceof NullPage) return "<div data-alert class='alert-box alert'>Die E-Mail {$u["email"]} wird bereits verwendet.</div>";
+
+  if(!$ldapHelper->ldapHelperRegistradeUser($u)) return "<div data-alert class='alert-box alert'>Das Anlegen eines LDAP Users hat leider nicht funktioniert. Bitte versuche es zu einem späteren Zeitpunkt noch einmal.</div> ";
+
+  $new_user = new User();
+  $new_user->of(false);
+  $new_user->name = $u["username"];
+  $new_user->email = $u["email"];
+  $new_user->pass = $u["password"];
+  $new_user->addRole("user");
+  $new_user->firstname = $u["firstname"];
+  $new_user->lastname = $u["lastname"];
+  $new_user->admin_theme = "AdminThemeReno";
+  $new_user->authkey = getToken();
+  $new_user->save();
+  $new_user->of(true);
+
+  $aktivierungslink = wire('page')->httpUrl ."?authkey=". $new_user->authkey ."&user=". $new_user->name;
+  $mail = wireMail();
+  $mail->to($u["email"])->from('registration@ffmyk.de');
+  $mail->subject("Account Aktivierung");
+  $mail->body("===== Account Aktivierung ===== \n\n
+  mit dieser E-Mail kannst du deinen soeben eingerichteten Account bei Freifunk-Myk aktivieren.\n
+  $aktivierungslink \n
+  Sollte der link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
+  if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
+
+  return "<div data-alert class='alert-box success radius'>Die Registrierung war erfolgreich, du erhälst nun eine E-Mail mit einem Aktivierungslink.</div>";
+}
 #################################################
 # secret
 #################################################
-function autorized($secret){
-  $pages = wire('pages');
-  $secrets = $pages->get("secret=$secret, template=supernode");
-  if($secrets instanceof NullPage) return false;
-  return true;
+function authorize($auth_user, $secret){
+  if($auth_user->authkey === $secret && $auth_user->authsuccess != true){
+    $auth_user->of(false);
+    $auth_user->authsuccess = true;
+    $auth_user->save();
+    $auth_user->of(true);
+
+    $mail = wireMail();
+    $mail->to($auth_user->email)->from('registration@ffmyk.de');
+    $mail->subject("Herzlich Wilkommen");
+    $mail->body("===== Wilkommen bei Freifunk-Myk ===== \n\n
+    Wir freuen uns dich bei Freifunk-Myk begrüßen zu dürfen. Im folgenden erkl&auml;ren wir dir die Besonderheiten deines Accounts. \n\n
+    === Mehr als nur ein Account === \n
+    Mit deinem Account bei Freifunk-Myk kannst du dich nicht nur auf unserer Webseite sondern bei vielen weiteren Diensten im Freifunk-Myk einloggen.\n
+    Ob Router Registrieren, Wiki editieren oder dich im Jabber zu unterhalten. Alles mit einem Account.\n\n
+    === Jabber ===\n
+    Jabber ist ein dezentraler Chatclient. Du kannst ihn auf deinem Computer oder auch auf deinem Smartphone nutzen.
+    Du besitzt mit der Registrierung auf Freifunk-Myk direkt einen Jabber Account mit der folgenden ID: {$auth_user->name}@ffmyk.de und deinem Passwort.
+    Wenn du dich einloggst findest du in deiner Kontaktliste direkt eine Liste der Administratoren und kannst dich mit ihnen unterhalten.\n\n
+    Das Freifunk-Myk Team wünscht dir viel Spaß und freut sich auf deine Mitarbeit.");
+    if($mail->send()) wire('log')->message("Send Mail: Welcome to {$auth_user->email} ") ;
+
+    return "<div data-alert class='alert-box success radius'>
+    Dein Account ist erfolgreich Aktiviert. Wir senden dir noch eine Wilkommens E-Mail in der du wichtige Informationen zu unseren Diensten und zu deinem Account findest.
+    </div>";
+  } else {
+    return "<div data-alert class='alert-box alert'>
+      Dein Account wurde bereits Aktiviert.
+    </div>";
+  }
+}
+
+function crypto_rand_secure($min, $max) {
+        $range = $max - $min;
+        if ($range < 0) return $min; // not so random...
+        $log = log($range, 2);
+        $bytes = (int) ($log / 8) + 1; // length in bytes
+        $bits = (int) $log + 1; // length in bits
+        $filter = (int) (1 << $bits) - 1; // set all lower bits to 1
+        do {
+            $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
+            $rnd = $rnd & $filter; // discard irrelevant bits
+        } while ($rnd >= $range);
+        return $min + $rnd;
+}
+
+function getToken($length=32){
+    $token = "";
+    $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    $codeAlphabet.= "abcdefghijklmnopqrstuvwxyz";
+    $codeAlphabet.= "0123456789";
+    for($i=0;$i<$length;$i++){
+        $token .= $codeAlphabet[crypto_rand_secure(0,strlen($codeAlphabet))];
+    }
+    return $token;
 }
