@@ -22,7 +22,7 @@ if($input->post->submit) {
 
 if(!wire('user')->isLoggedin() && !wire('input')->post->submit || !wire('user')->isLoggedin() && !wire('input')->get->authkey){
   $content .= renderPage('registration_form');
-} elseif(!wire('input')->post->submit) {
+} elseif(!wire('input')->post->submit || !wire('input')->get->authkey) {
   $content .= "<div data-alert class='alert-box alert'>
     Du bist eingeloggt!
   </div> ";
