@@ -364,7 +364,7 @@ function authorize($auth_user, $secret){
     $mail->to($auth_user->email)->from('registration@ffmyk.de');
     $mail->subject("Herzlich Wilkommen");
     $mail->body("===== Wilkommen bei Freifunk-Myk ===== \n\n
-    Wir freuen uns dich bei Freifunk-Myk begrüßen zu dürfen. Im folgenden erkl&auml;ren wir dir die Besonderheiten deines Accounts. \n\n
+    Wir freuen uns dich bei Freifunk-Myk begrüßen zu dürfen. Im folgenden erklären wir dir die Besonderheiten deines Accounts. \n\n
     === Mehr als nur ein Account === \n
     Mit deinem Account bei Freifunk-Myk kannst du dich nicht nur auf unserer Webseite sondern bei vielen weiteren Diensten im Freifunk-Myk einloggen.\n
     Ob Router Registrieren, Wiki editieren oder dich im Jabber zu unterhalten. Alles mit einem Account.\n\n

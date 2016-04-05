@@ -48,11 +48,19 @@ if($input->urlSegment1){
           //if(!autorized($input->secret)) throw new Wire404Exception();
           $useMain = false;
           $nodes = $pages->find("template=node, key!=''");
+          $router_new = array();
           $router = array();
-          foreach($nodes as $node) {
-              $router[] = array('MAC' => "{$node->title}",
-                                'PublicKey' => "{$node->key}");
+          $router_old = file_get_contents("http://register.freifunk-myk.de/srvapi.php");
+          $router_old = unserialize($router_old);
+
+          foreach($nodes as $node){
+                $router_new[] = array('MAC' => "$node->title",
+                                  'PublicKey' => "$node->key");
           }
+
+          $list = array_merge($router_old, $router_new);
+          $router = array_map("unserialize", array_unique(array_map("serialize", $list)));
+
           echo serialize($router);
         break;
         case 'import':
