@@ -23,4 +23,4 @@ config.php
 /templates/stylesheets/*
 
 ### Sensitive ###
-#templates/scripts/node_migration.php
+templates/scripts/node_migration.php
