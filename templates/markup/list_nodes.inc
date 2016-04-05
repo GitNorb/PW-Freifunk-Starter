@@ -15,4 +15,5 @@
       <?=$page->table?>
     </tbody>
   </table>
+  <p>Wenn du deine Nodes aus vom Alten Noderegister übernehmen möchtest rufe bitte folgende Seite auf: <a href="<?=$pages->get('/node/')->httpUrl?>import">https://www.ffmyk.de/node/import</a></p>
 </article><!-- #article -->

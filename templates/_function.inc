@@ -280,28 +280,26 @@ function createPage($template, $parent, $title){
  * @return string         the Output String to Display the Information of register Node
  */
 function registerNode($mac, $key){
-  if(empty($mac) || empty($key)) return;
+  if(empty($mac) || empty($key)) return false;
 
   $page = wire('page');
   $node = wire('pages')->get("template=node, title=$mac");
   $parent = wire('pages')->get($page->id);
   $operator = wire('user')->id;
 
-  // Check some part of node
+  // If node exist?
   if($node instanceof Nullpage){
     $titlemac = strtoupper($mac);
     $n = createPage('node', $parent, $titlemac);
-    $title = "<h2>Node hinzugefügt:</h2>";
+    $title = "Hinzugefügt";
+    // Owner is not current User
   } elseif($node->operator->id != $operator) {
-    // Checke ob der Node vom Besitzer geändert wird.
-    $content = "<h2>Node nicht Hinzugefügt</h2>
-                <p>
-                Der Node ist auf einen anderen User registriert. Um ihn registrieren zu können muss der alte Besitzer den Node aus seinem Profil löschen.
-                </p>";
+    $content = "<li>Der Node mit der MAC Adresse: $mac ist bereits registriert.</li>";
     return $content;
+    // Node Aktualisieren
   } else {
     $n = $node;
-    $title = "<h2>Node aktualisiert:</h2>";
+    $title = "Aktualisiert";
   }
 
   $n->key = $key;
@@ -310,12 +308,7 @@ function registerNode($mac, $key){
   $n->save();
   $n->of(true);
 
-  $content = "$title
-              <p>
-              Titel: {$n->title}<br>
-              Key : {$n->key}<br>
-              Betreiber: {$n->operator->name}
-              </p>";
+  $content = "<li>$title: $mac</li>";
 
   wire('session')->remove('key');
   wire('session')->remove('mac');

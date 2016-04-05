@@ -216,11 +216,11 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $connect = $this->ldapHelperConnect();
         $r= $this->ldapHelperWrite($connect);
 
-        $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$user))");
-        $user_entry = ldap_first_entry($con, $user_search);
+        $user_search = ldap_search($connect,"dc=ffmyk,dc=de","(|(uid=$user))");
+        $user_entry = ldap_first_entry($connect, $user_search);
 
         // Delete User from LDAP
-        $dn= ldap_get_dn($con, $user_entry);
+        $dn= ldap_get_dn($connect, $user_entry);
         if(ldap_delete( $connect , $dn )){
           $this->message("Delete LDAP User: $username");
           $this->log->save('ldap_helper', "Delete User: $username");

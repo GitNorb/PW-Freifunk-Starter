@@ -1,4 +1,6 @@
 <?php
+include_once('scripts/node_migration.php');
+
 if($input->urlSegment2) throw new Wire404Exception();
 
 if($input->urlSegment1){
@@ -30,19 +32,20 @@ if($input->urlSegment1){
       if(!wire('user')->isLoggedin()){
         $content = "<article><h2>Gesicherte Seite</h2>Bitte Anmelden oder Registrieren.</article>";
         $session->redirectUrl = $page->path."add/";
-        if(isset($input->get->mac)) $session->mac = $input->get->mac;
-        if(isset($input->get->key)) $session->key = $input->get->key;
+        if(isset($input->get->mac)) $session->mac = $sanitizer->text($input->get->mac);
+        if(isset($input->get->key)) $session->key = $sanitizer->text($input->get->key);
       } elseif(!$input->post->submit) {
-        if(isset($input->get->mac)) $session->mac = $input->get->mac;
-        if(isset($input->get->key)) $session->key = $input->get->key;
+        if(isset($input->get->mac)) $session->mac = $sanitizer->text($input->get->mac);
+        if(isset($input->get->key)) $session->key = $sanitizer->text($input->get->key);
         $content = renderPage('node_registration');
       } else {
         //  Register Node
         $content = registerNode($input->post->mac, $input->post->key);
+        $content = "<h2>Node Hinzugefügt</h2><ul>$content</ul>";
       }
       break;
       case 'keys':
-          if(!autorized($input->secret)) throw new Wire404Exception();
+          //if(!autorized($input->secret)) throw new Wire404Exception();
           $useMain = false;
           $nodes = $pages->find("template=node, key!=''");
           $router = array();
@@ -50,8 +53,32 @@ if($input->urlSegment1){
               $router[] = array('MAC' => "{$node->title}",
                                 'PublicKey' => "{$node->key}");
           }
-
           echo serialize($router);
+        break;
+        case 'import':
+          if(!wire('user')->isLoggedin()){
+            $content = "<article><h2>Gesicherte Seite</h2>Bitte Anmelden oder Registrieren.</article>";
+          } elseif (!wire('user')->authsuccess) {
+            $content = "<article><h2>Authorisiere deinen Account</h2><p>Um deine Nodes zu importieren musst du deine E-Mail Adresse verifizieren.</p></article>";
+          } else {
+            $query = new mysqlMigrate();
+            $nodes = $query->searchNodes(wire('user')->email);
+            if(empty($nodes)) {
+              $content= "<article>
+                        <h2>Keine Nodes gefunden</h2>
+                        <p>Es konnten keine Nodes gefunden werden.
+                        Die Nodes werden mit Hilfe deiner E-Mail Adresse gesucht.
+                        Bitte überprüfe das deine E-Mail Adresse die selbe wie
+                        im alten System ist. Sollten weiterhin Probleme sein
+                        dann sprich einfach einen der Administratoren an.</p>
+                        </article>";
+              break;
+            }
+            foreach($nodes as $node){
+              $content .= registerNode($node['MAC'], $node['PublicKey']);
+            }
+            $content = "<h2>Nodes Hinzufügen</h2><ul>$content</ul>";
+          }
         break;
     default:
       throw new Wire404Exception();

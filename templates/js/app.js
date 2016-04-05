@@ -1,3 +1,3 @@
-// Foundation JavaScript
-// Documentation can be found at: http://foundation.zurb.com/docs
-$(document).foundation();
+//@prepros-prepend ../bower_components/jquery/dist/jquery.min.js
+//@prepros-prepend ../bower_components/modernizr/modernizr.js
+//@prepros-append ../bower_components/foundation/js/foundation.js

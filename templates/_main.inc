@@ -15,15 +15,12 @@ if($page->brower_title) $browserTitle = $page->browser_title;
 
 // add our stylesheet
 #$config->styles->add($config->urls->templates . 'stylesheets/app.css');
-$config->styles->add($config->urls->templates.'stylesheets/app.css');
+$config->styles->add($config->urls->templates.'css/app.css');
 #$config->styles->add('https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css');
 #$config->styles->add('https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css');
 
 // add our javascripts
-$config->scripts->prepend($config->urls->templates.'bower_components/modernizr/modernizr.js');
-$config->scripts->add($config->urls->templates.'bower_components/jquery/dist/jquery.min.js');
-$config->scripts->add($config->urls->templates.'bower_components/foundation/js/foundation.min.js');
-$config->scripts->add($config->urls->templates.'js/app.js');
+$config->scripts->add($config->urls->templates.'js/app-dist.js');
 
 /********************************
 * Hendle Login
@@ -141,6 +138,10 @@ if(!wire('user')->isLoggedin()){
       		foreach($config->scripts as $file) echo "\n\t<script src='$file'></script>";
     }
   ?>
-
+  <script>
+	// Foundation JavaScript
+	// Documentation can be found at: http://foundation.zurb.com/docs
+	$(document).foundation();
+  </script>
 </body>
 </html>
