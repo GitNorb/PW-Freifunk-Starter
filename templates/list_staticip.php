@@ -74,8 +74,8 @@ if($input->urlSegment1){
   }
 
 } else {
-  $user = wire('user')->id;
-  $services = $pages->find("operator=$user, template=staticip, sort=-subtitle");
+  $userid = wire('user')->id;
+  $services = $pages->find("operator=$userid, template=staticip, sort=-subtitle");
   $table = '';
 
   foreach($services as $service){
