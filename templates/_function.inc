@@ -345,7 +345,7 @@ function registerUser($u){
   $mail->body("===== Account Aktivierung ===== \n\n
   mit dieser E-Mail kannst du deinen soeben eingerichteten Account bei Freifunk-Myk aktivieren.\n
   $aktivierungslink \n
-  Sollte der link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
+  Sollte der Link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
   if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
 
   return "<div data-alert class='alert-box success radius'>Die Registrierung war erfolgreich, du erhälst nun eine E-Mail mit einem Aktivierungslink.</div>";
