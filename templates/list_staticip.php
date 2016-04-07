@@ -63,7 +63,7 @@ if($input->urlSegment1){
                     Titel: {$s->subtitle}<br>
                     MAC : {$s->title}<br>
                     IP : {$s->static_ip}<br>
-                    Betreiber: {$users->get($n->operator)->name}
+                    Betreiber: {$users->get($s->operator)->name}
                     </p>";
         $session->remove('key');
         $session->remove('mac');
