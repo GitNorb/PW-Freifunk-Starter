@@ -348,6 +348,12 @@ function registerUser($u){
   Sollte der Link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
   if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
 
+  $session = wire('session');
+  $session->remove('username');
+  $session->remove('email');
+  $session->remove('firstname');
+  $session->remove('lastname');
+
   return "<div data-alert class='alert-box success radius'>Die Registrierung war erfolgreich, du erhälst nun eine E-Mail mit einem Aktivierungslink.</div>";
 }
 #################################################

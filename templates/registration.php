@@ -5,6 +5,11 @@ $content = '';
 // form was submitted so we process the form
 if($input->post->submit) {
 
+        $session->set('username', "{$sanitizer->username($input->post->username)}");
+        $session->set('email', "{$sanitizer->email($input->post->email)}");
+        $session->set('firstname', "{$sanitizer->text($input->post->firstname)}");
+        $session->set('lastname', "{$sanitizer->text($input->post->lastname)}");
+
          //Sanatize and assign variables data before creating user.
         $nuser["username"] = $sanitizer->username($input->post->username);
         $nuser["email"] = $sanitizer->email($input->post->email);
