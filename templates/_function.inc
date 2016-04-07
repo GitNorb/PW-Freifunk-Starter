@@ -345,7 +345,7 @@ function registerUser($u){
   $mail->body("===== Account Aktivierung ===== \n\n
   mit dieser E-Mail kannst du deinen soeben eingerichteten Account bei Freifunk-Myk aktivieren.\n
   $aktivierungslink \n
-  Sollte der link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
+  Sollte der Link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
   if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
 
   return "<div data-alert class='alert-box success radius'>Die Registrierung war erfolgreich, du erhälst nun eine E-Mail mit einem Aktivierungslink.</div>";
@@ -364,12 +364,12 @@ function authorize($auth_user, $secret){
     $mail->to($auth_user->email)->from('registration@ffmyk.de');
     $mail->subject("Herzlich Wilkommen");
     $mail->body("===== Wilkommen bei Freifunk-Myk ===== \n\n
-    Wir freuen uns dich bei Freifunk-Myk begrüßen zu dürfen. Im folgenden erklären wir dir die Besonderheiten deines Accounts. \n\n
+    Wir freuen uns dich bei Freifunk-Myk begrüßen zu dürfen. Im Folgenden erklären wir dir die Besonderheiten deines Accounts. \n\n
     === Mehr als nur ein Account === \n
-    Mit deinem Account bei Freifunk-Myk kannst du dich nicht nur auf unserer Webseite sondern bei vielen weiteren Diensten im Freifunk-Myk einloggen.\n
-    Ob Router Registrieren, Wiki editieren oder dich im Jabber zu unterhalten. Alles mit einem Account.\n\n
+    Mit deinem Account bei Freifunk-Myk kannst du dich nicht nur auf unserer Webseite, sondern bei vielen weiteren Diensten im Freifunk-Myk einloggen.\n
+    Ob Router registrieren, Wiki editieren oder dich im Jabber zu unterhalten. Alles mit einem Account.\n\n
     === Jabber ===\n
-    Jabber ist ein dezentraler Chatclient. Du kannst ihn auf deinem Computer oder auch auf deinem Smartphone nutzen.
+    Jabber ist ein föderalisiertes Chatsystem. Es stehten Clients für Computer, Smartphones und andere Geräte bereit.
     Du besitzt mit der Registrierung auf Freifunk-Myk direkt einen Jabber Account mit der folgenden ID: {$auth_user->name}@ffmyk.de und deinem Passwort.
     Wenn du dich einloggst findest du in deiner Kontaktliste direkt eine Liste der Administratoren und kannst dich mit ihnen unterhalten.\n\n
     Das Freifunk-Myk Team wünscht dir viel Spaß und freut sich auf deine Mitarbeit.");
