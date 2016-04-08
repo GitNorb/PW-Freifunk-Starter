@@ -1,37 +1,4 @@
 <?php
-function makeTable(PageArray $pages, $tableArray, $status = false){
-  $tableHead = '';
-  $tableBody = '';
-
-  // Head
-  foreach($tableArray as $key => $value){
-    $tableHead .= "<th>$key</th>";
-  }
-
-  // Body
-  foreach($pages as $p){
-    $tableBody .= ($status ? "<tr class='".($p->online == 1 ? "alert success" : "alert danger")."'>" : "<tr>") ;
-    foreach($tableArray as $value){
-      $tableBody .= "<td>{$p->get($value)}</td>";
-    }
-    $tableBody .= "</tr>";
-  }
-
-  // Structur
-  $table = "<table>
-              <thead>
-                <tr>
-                $tableHead
-                </tr>
-              </thead>
-                <tbody>
-                $tableBody
-                </tbody>
-              </table>";
-
-  return $table;
-}
-
 // Wenn inputsegment 1 nicht gesetzt ist dann leite auf den aktuellen Benutzer weiter.
 if(!wire('user')->isLoggedin()) throw new Wire404Exception();
 
