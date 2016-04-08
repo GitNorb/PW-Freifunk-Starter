@@ -11,13 +11,12 @@ if($input->urlSegment1){
 
       foreach($nodes as $node){
 
-        $status = ($node->online == 1 ? "alert success" : "alert danger");
-        $table .="<tr class='$status'>
+        $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
                   <td>$node->subtitle</td>
                   <td>$node->title</td>
                   <td>$node->latitude</td>
                   <td>$node->longitude</td>
-                  <td>$node->online</td>
+                  <td>".($node->online == 1 ? "online" : "offline")."</td>
                   <td><a href='{$pages->get('/profile/')->httpUrl}{$node->operator->name}'>{$node->operator->name}</a></td>
                 </tr>";
       }
@@ -26,6 +25,8 @@ if($input->urlSegment1){
       $content = renderPage();
       break;
     case 'map':
+      $content= "<div class='map'></div>";
+      $config->scripts->add($config->urls->templates.'js/map.js');
       break;
     case 'add':
       // Check if user is logged in and save the input->get in the session variable.
@@ -99,14 +100,12 @@ if($input->urlSegment1){
 
   foreach($nodes as $node){
 
-    $status = ($node->online == 1 ? "alert success" : "alert danger");
-    $online = ($node->online == 1 ? "online" : "offline");
-    $table .="<tr class='$status'>
+    $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
               <td>$node->subtitle</td>
               <td>$node->title</td>
               <td>$node->latitude</td>
               <td>$node->longitude</td>
-              <td>$online</td>
+              <td>".($node->online == 1 ? "online" : "offline")."</td>
               <td>{$node->operator->name}</td>
             </tr>";
   }
