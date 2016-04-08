@@ -66,7 +66,7 @@ if(!wire('user')->isLoggedin()){
 
 </head>
 <body>
-  <header class="fixed contain-to-grid">
+  <header id="header" class="fixed contain-to-grid">
     <?php include_once('_nav.inc'); ?>
   </header><!-- #sticky -->
 
@@ -90,12 +90,12 @@ if(!wire('user')->isLoggedin()){
       ?>
     <?php
     // Homepage (Landingpage) wird direkt im container
-    echo ($page->id === 1 ? $content :   '<div id="content" class="row">'.$content.'</div>');
+    echo ($page->id === 1 || $fullwidth == true ? $content :   '<div id="content" class="row">'.$content.'</div>');
     ?>
   </section>
 <section>
 </section>
-  <footer class="footer">
+  <footer id="footer" class="footer">
     <div class="row">
       <div class="small-12 medium-4 medium-push-8 columns">
         <ul class="inline-list social">
@@ -143,5 +143,6 @@ if(!wire('user')->isLoggedin()){
 	// Documentation can be found at: http://foundation.zurb.com/docs
 	$(document).foundation();
   </script>
+  <?php if(!empty($script)) echo $script; ?>
 </body>
 </html>

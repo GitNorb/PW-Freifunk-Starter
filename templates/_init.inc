@@ -18,6 +18,7 @@ $url = $page->httpUrl;
 $today = time();
 $id = $page->id;
 $title = $page->get("headline|title");
+$fullwidth = false;
 
 /**
  * authorURL

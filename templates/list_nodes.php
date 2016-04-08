@@ -25,8 +25,55 @@ if($input->urlSegment1){
       $content = renderPage();
       break;
     case 'map':
-      $content= "<div class='map'></div>";
-      $config->scripts->add($config->urls->templates.'js/map.js');
+      // Site settings
+      $config->styles->add($config->urls->templates.'css/leaflet.css');
+      $config->scripts->add($config->urls->templates.'js/leaflet-src.js');
+      $fullwidth = true;
+
+      $content= "<div id='map' style='width:100%' class='map'></div>";
+
+      // Find all nodes with coordinate
+      $nodes = $pages->find("template=node, latitude!=''");
+      $marker = '';
+
+      // create the node markers
+      foreach($nodes as $node){
+        $marker .= "L.circle([{$node->latitude}, {$node->longitude}], 10, {
+                                  color:".($node->online == 1 ? "'blue'" : "'red'").",
+                                  fillColor: ".($node->online == 1 ? "'blue'" : "'red'")."
+                    }).addTo(map)
+                      .bindPopup('{$node->subtitle}');";
+      }
+
+      // create the Map with Markers
+      $script = "<script>
+                  var map = L.map('map').setView([50.35839, 7.48444], 10);
+                  var besuch = new Date().getHours();
+
+                  if (besuch < 22 || besuch > 6) {
+                    // Tagesansicht
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    	maxZoom: 19,
+                    	attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
+                    }).addTo(map);
+                  } else {
+                    // Nachtansicht
+                    L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+                    	maxZoom: 19,
+                    	attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
+                    }).addTo(map);
+                  }
+
+                  $marker
+
+                  map.on('click', function(e){
+                    alert('Geoposition = ' + e.latlng);
+                  })
+
+                  $('#map').height($(window).height() - 205).width($(window).width());
+                    map.invalidateSize();
+                  </script>";
+
       break;
     case 'add':
       // Check if user is logged in and save the input->get in the session variable.
