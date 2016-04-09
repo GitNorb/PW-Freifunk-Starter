@@ -47,22 +47,39 @@ if($input->urlSegment1){
 
       // create the Map with Markers
       $script = "<script>
-                  var map = L.map('map').setView([50.35839, 7.48444], 10);
-                  var besuch = new Date().getHours();
+                var map = L.map('map').setView([50.3588, 7.48407], 10);
+                var besuch = new Date().getHours();
 
-                  if (besuch < 22 || besuch > 6) {
-                    // Tagesansicht
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    	maxZoom: 19,
-                    	attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
-                    }).addTo(map);
-                  } else {
-                    // Nachtansicht
-                    L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-                    	maxZoom: 19,
-                    	attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
-                    }).addTo(map);
-                  }
+                if (besuch < 22 || besuch > 6) {
+                  // Tagesansicht
+                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
+                  }).addTo(map);
+                } else {
+                  // Nachtansicht
+                  L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
+                  }).addTo(map);
+                }
+
+                // Geolokalisierung
+                map.locate({setView: true, maxZoom: 16});
+
+                // Zoom to current possition
+                function onLocationFound(e) {
+                  var radius = e.accuracy / 2;
+
+                  L.circle(e.latlng, radius).addTo(map)
+                      .bindPopup(\"You are within \" + radius + \" meters from this point\").openPopup();
+
+                  L.circle(e.latlng, radius).addTo(map);
+                }
+
+                // sobald coordinaten gefunden wurden
+                map.on('locationfound', onLocationFound);
+
 
                   $marker
 
