@@ -5,12 +5,13 @@
 </div>
 <div data-magellan-expedition='fixed' class='second-nav'>
  <div class='row'>
-   <div class='small-12 medium-7 medium-centered large-6 large-centered columns'>
+   <div class='small-12 medium-7 medium-centered large-7 large-centered columns'>
      <dl class='sub-nav'>
        <dd data-magellan-arrival='freifunk-description'><a href='#freifunk-description'>Freifunk</a></dd>
        <dd data-magellan-arrival='freifunk-faq'><a href='#freifunk-faq'>Häufige Fragen</a></dd>
        <dd data-magellan-arrival='timeline'><a href='#timeline'>Timeline</a></dd>
        <dd data-magellan-arrival='mitmachen'><a href='#mitmachen'>Mitmachen</a></dd>
+       <dd data-magellan-arrival='kontakt'><a href='#kontakt'>Kontakt</a></dd>
      </dl>
    </div>
  </div>
@@ -99,125 +100,169 @@
 <?=renderTimeline($pages->find("template=post, timeline=1, sort=-date, limit=6"))?>
 
 <section id='mitmachen' data-magellan-destination='mitmachen' class='info container row background_gray'>
-    <div class='large-12 columns'>
-      <div class='text-center'>
-        <h2>Mitmachen</h2>
-        <h3 class='subheader'><small>erweitere mit uns das Freifunk Netz</small></h3>
-        <p>
-          Gerne kannst du zu einem unserer regelmäßig (jeden 1. Dienstag 19:30) stattfindenden Treffen im Clostersudhaus in der Triererstraße 105 in 56072 Koblenz kommen. Wir beantworten alle Fragen und helfen beim Einrichten neuer Router.
-          Natürlich hält dich niemand davon ab einfach weiter auf unserer Webseite und im Wiki zu stöbern. Bei Fragen kannst du auch unsere Mailinglist kontaktieren.
-        </p>
-      </div>
-      <div class='row'>
-        <div class='medium-4 columns'>
-          <h2>Starter-Kit</h2>
-          <h3 class='subheader'><small>Wohnung, Geschäft, Café, Restaurant, Bar</small></h3>
-          <dl>
-            <dt>Du möchtest</dt>
-            <dd>
+  <div class='large-12 columns'>
+    <div class='text-center'>
+      <h2>Mitmachen</h2>
+      <h3 class='subheader'><small>erweitere mit uns das Freifunk Netz</small></h3>
+      <p>
+        Gerne kannst du zu einem unserer regelmäßig (jeden 1. Dienstag 19:30) stattfindenden Treffen im Clostersudhaus in der Triererstraße 105 in 56072 Koblenz kommen. Wir beantworten alle Fragen und helfen beim Einrichten neuer Router.
+        Natürlich hält dich niemand davon ab einfach weiter auf unserer Webseite und im Wiki zu stöbern. Bei Fragen kannst du auch unsere Mailinglist kontaktieren.
+      </p>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='medium-4 columns'>
+      <h2>Starter-Kit</h2>
+      <h3 class='subheader'><small>Wohnung, Geschäft, Café, Restaurant, Bar</small></h3>
+      <dl>
+        <dt>Du möchtest</dt>
+        <dd>
+          <ul>
+            <li>dich mit dem Freifunk-Netz in deiner Nachbarschaft verbinden.</li>
+            <li>deinen Internet-Anschluss freigeben.</li>
+            <li>den ersten Freifunk-Router in deiner Umgebung aufstellen.</li>
+          </ul>
+        </dd>
+        <dt>So kannst du mitmachen</dt>
+        <dd>
+          <ul>
+            <li>
+              Besorge einen Freifunk-fähigen Router. Empfehlungen:
+              <span data-original-title='TP-Link TL-WDR4300, ~70 EUR, 2.4 GHz und 5 GHz.' class='description' data-toggle='tooltip' title=''>TL-WR-841N</span>,
+              <span data-original-title='TP-Link TL-WR842ND, ~30 EUR, nur 2.4 GHz, etwas knappe 32MB RAM.' class='description' data-toggle='tooltip' title=''>TL-WDR4300</span>.
+            </li>
+            <li>
+              Falls du deinen Internet-Zugang freigeben möchtest, musst du deinen VPN Key auf unserer Webseite <a href="<?=$pages->get('/node/')->httpUrl?>add">eintragen</a>.
+              Danach kannst du den Router ans Internet anschließen.
+              <!-- TODO: Link (wie komme ich an den account?) -->
+            </li>
+            <li>
+              Gehe wie im <a href='../howto'>HowTo</a> beschrieben vor, um die Firmware zu flashen und zu konfigurieren.
+            </li>
+            <li>Stelle den Router an einem geeigneten Ort auf (z.B. Fensterbank).</li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+    <div class='medium-4 columns'>
+      <h2>Level 2</h2>
+      <h3 class='subheader'><small>Balkon, hohes Gebäude, öffentlicher Platz, Park, weitläufiges Gelände</small></h3>
+      <dl>
+        <dt>Du möchtest</dt>
+        <dd>
+          <ul>
+            <li>
+              das Freifunk-Netz auf ein größeres Gebiet erweitern. Dazu eignen
+              sich insbesondere höher gelegene Standorte (z.B. Balkone oder
+              Dächer) auf 2.4 GHz.
+            </li>
+            <li>
+              eine Verbindung zu einem weiter entfernten (bis ~5km)
+              Freifunk-Router herstellen. Für stabile Verbindungen wird eine freie
+              Sicht zum entfernten Router sowie das 5 GHz-Band benötigt.
+            </li>
+          </ul>
+        </dd>
+        <dt>So kannst du mitmachen</dt>
+        <dd>
+          <ul>
+            <li>
+              Besorge einen Freifunk-fähigen Outdoor-Router. Empfehlungen:
               <ul>
-                <li>dich mit dem Freifunk-Netz in deiner Nachbarschaft verbinden.</li>
-                <li>deinen Internet-Anschluss freigeben.</li>
-                <li>den ersten Freifunk-Router in deiner Umgebung aufstellen.</li>
+                <li>
+                  <span data-original-title='Ubiquiti NanoStation M2, ~80 EUR, 2.4 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>NanoStation M2</span> oder
+                  <span data-original-title='Ubiquiti NanoStation M2 loco, ~60 EUR, 2.4 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>M2 loco</span> oder
+                  <span data-original-title='TP-Link CPE210, ~50 EUR, 2.4 GHz, 64MB RAM.' class='description' data-toggle='tooltip' title=''>TL-CPE 210</span> (alle 2.4 GHz)
+                </li>
+                <li>
+                  <span data-original-title='Ubiquiti NanoStation M5, ~80 EUR, 5 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>NanoStation M5</span> oder
+                  <span data-original-title='Ubiquiti NanoStation M5 loco, ~60 EUR, 5 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>M5 loco</span> (alle 5 GHz).
+                </li>
               </ul>
-            </dd>
-            <dt>So kannst du mitmachen</dt>
-            <dd>
+            </li>
+            <li>
+              Eventuell kannst du diese Hardware im Rahmen einer
+              <a href='https://wiki.freifunk.net/Berlin:%C3%9Cberlassungserkl%C3%A4rung' class='externalLink'>Überlassungserklärung</a> leihen.
+            </li>
+            <li>
+              Zur Planung der neuen Verbindungen solltest du mit den Freifunker_innen,
+              die die entfernten Router betreiben, <a href='../../contact'>Kontakt aufnehmen</a>.
+            </li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+    <div class='medium-4 columns'>
+      <h2>Backbone</h2>
+      <h3 class='subheader'><small>Dach, Dachgeschoss, hohes Gebäude, öffentliches Gebäude, Rathaus, Kirchturm...</small></h3>
+      <dl>
+        <dt>Du möchtest</dt>
+        <dd>
+          <ul>
+            <li>
+              das \"Rückgrat\" des Freifunk-Netzes stärken, indem du stabile
+              Richtfunk-Verbindungen zu weit entfernten Freifunk-Routern
+              aufbaust (bis ~10km). Für stabile Verbindungen wird eine freie
+              Sicht zum entfernten Router benötigt.
+            </li>
+          </ul>
+        </dd>
+        <dt>So kannst du mitmachen</dt>
+        <dd>
+          <ul>
+            <li>
+              Besorge mehrere Freifunk-fähige Outdoor-Router für 5 GHz. Empfehlungen:
               <ul>
-                <li>
-                  Besorge einen Freifunk-fähigen Router. Empfehlungen:
-                  <span data-original-title='TP-Link TL-WDR4300, ~70 EUR, 2.4 GHz und 5 GHz.' class='description' data-toggle='tooltip' title=''>TL-WR-841N</span>,
-                  <span data-original-title='TP-Link TL-WR842ND, ~30 EUR, nur 2.4 GHz, etwas knappe 32MB RAM.' class='description' data-toggle='tooltip' title=''>TL-WDR4300</span>.
-                </li>
-                <li>
-                  Falls du deinen Internet-Zugang freigeben möchtest, musst du deinen VPN Key auf unserer Webseite <a href="<?=$pages->get('/node/')->httpUrl?>add">eintragen</a>.
-                  Danach kannst du den Router ans Internet anschließen.
-                  <!-- TODO: Link (wie komme ich an den account?) -->
-                </li>
-                <li>
-                  Gehe wie im <a href='../howto'>HowTo</a> beschrieben vor, um die Firmware zu flashen und zu konfigurieren.
-                </li>
-                <li>Stelle den Router an einem geeigneten Ort auf (z.B. Fensterbank).</li>
+                <li> <span data-original-title='Ubiquiti NanoStation M5, ~80 EUR, 5 GHz.' class='description' data-toggle='tooltip' title=''>NanoStation M5</span> (bis ~5 km) </li>
+                <li> <span data-original-title='Ubiquiti NanoBridge M5, ~80 EUR, 5 GHz.' class='description' data-toggle='tooltip' title=''>NanoBridge M5</span> (bis ~10 km) </li>
               </ul>
-            </dd>
-          </dl>
-        </div>
-        <div class='medium-4 columns'>
-          <h2>Level 2</h2>
-          <h3 class='subheader'><small>Balkon, hohes Gebäude, öffentlicher Platz, Park, weitläufiges Gelände</small></h3>
-          <dl>
-            <dt>Du möchtest</dt>
-            <dd>
-              <ul>
-                <li>das Freifunk-Netz auf ein größeres Gebiet erweitern. Dazu eignen
-                  sich insbesondere höher gelegene Standorte (z.B. Balkone oder
-                  Dächer) auf 2.4 GHz.</li>
-                  <li>eine Verbindung zu einem weiter entfernten (bis ~5km)
-                    Freifunk-Router herstellen. Für stabile Verbindungen wird eine freie
-                    Sicht zum entfernten Router sowie das 5 GHz-Band benötigt.</li>
-                  </ul>
-                </dd>
-                <dt>So kannst du mitmachen</dt>
-                <dd>
-                  <ul>
-                    <li>Besorge einen Freifunk-fähigen Outdoor-Router. Empfehlungen:
-                      <ul>
-                        <li>
-                          <span data-original-title='Ubiquiti NanoStation M2, ~80 EUR, 2.4 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>NanoStation M2</span> oder
-                          <span data-original-title='Ubiquiti NanoStation M2 loco, ~60 EUR, 2.4 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>M2 loco</span> oder
-                          <span data-original-title='TP-Link CPE210, ~50 EUR, 2.4 GHz, 64MB RAM.' class='description' data-toggle='tooltip' title=''>TL-CPE 210</span> (alle 2.4 GHz)
-                        </li>
-                        <li>
-                          <span data-original-title='Ubiquiti NanoStation M5, ~80 EUR, 5 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>NanoStation M5</span> oder
-                          <span data-original-title='Ubiquiti NanoStation M5 loco, ~60 EUR, 5 GHz, 32MB RAM.' class='description' data-toggle='tooltip' title=''>M5 loco</span> (alle 5 GHz).
-                        </li>
-                      </ul>
-                    </li>
-                    <li>Eventuell kannst du diese Hardware im Rahmen einer
-                      <a href='https://wiki.freifunk.net/Berlin:%C3%9Cberlassungserkl%C3%A4rung' class='externalLink'>Überlassungserklärung</a> leihen.
-                    </li>
-                    <li>Zur Planung der neuen Verbindungen solltest du mit den Freifunker_innen,
-                      die die entfernten Router betreiben, <a href='../../contact'>Kontakt aufnehmen</a>.</li>
-                    </ul>
-                  </dd>
-                </dl>
-              </div>
-              <div class='medium-4 columns'>
-                <h2>Backbone</h2>
-                <h3 class='subheader'><small>Dach, Dachgeschoss, hohes Gebäude, öffentliches Gebäude, Rathaus, Kirchturm...</small></h3>
-                <dl>
-                  <dt>Du möchtest</dt>
-                  <dd>
-                    <ul>
-                      <li>das \"Rückgrat\" des Freifunk-Netzes stärken, indem du stabile
-                        Richtfunk-Verbindungen zu weit entfernten Freifunk-Routern
-                        aufbaust (bis ~10km). Für stabile Verbindungen wird eine freie
-                        Sicht zum entfernten Router benötigt.</li>
-                      </ul>
-                    </dd>
-                    <dt>So kannst du mitmachen</dt>
-                    <dd>
-                      <ul>
-                        <li>Besorge mehrere Freifunk-fähige Outdoor-Router für 5 GHz.
-                          Empfehlungen:
-                          <ul>
-                            <li>
-                              <span data-original-title='Ubiquiti NanoStation M5, ~80 EUR, 5 GHz.' class='description' data-toggle='tooltip' title=''>NanoStation M5</span> (bis ~5 km)
-                            </li>
-                            <li>
-                              <span data-original-title='Ubiquiti NanoBridge M5, ~80 EUR, 5 GHz.' class='description' data-toggle='tooltip' title=''>NanoBridge M5</span> (bis ~10 km)
-                            </li>
-                          </ul>
-                        </li>
-                        <li>Eventuell kannst du diese Hardware im Rahmen einer
-                          <a href='https://wiki.freifunk.net/Berlin:%C3%9Cberlassungserkl%C3%A4rung' class='externalLink'>Überlassungserklärung</a> leihen.
-                        </li>
-                        <li>Zur Planung der neuen Verbindungen solltest du mit den Freifunker_innen,
-                          die die entfernten Router betreiben, <a href='../../contact'>Kontakt aufnehmen</a>.</li>
-                        </ul>
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-          </section>
+            </li>
+            <li>Eventuell kannst du diese Hardware im Rahmen einer <a href='https://wiki.freifunk.net/Berlin:%C3%9Cberlassungserkl%C3%A4rung' class='externalLink'>Überlassungserklärung</a> leihen. </li>
+            <li>Zur Planung der neuen Verbindungen solltest du mit den Freifunker_innen, die die entfernten Router betreiben, <a href='../../contact'>Kontakt aufnehmen</a>.</li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id='kontakt' data-magellan-destination='kontakt' class='info container row'>
+ <div class='large-12 columns text-center'>
+   <h2>Kontakt</h2>
+   <h3 class='subheader'><small>Nutzen Sie unser Kontaktformular oder tragen SIe sich in unsere Mailinglist ein.</small></h3>
+
+   <form name="contactform" method="post" action="<?=$config->urls->templates?>scripts/contact_me.php" id="contactForm">
+       <div class="row">
+           <div class="medium-6 columns">
+               <div class="form-group">
+                   <input type="text" class="form-control" placeholder="Dein Name *" id="name" required data-validation-required-message="Bitte Name eintragen.">
+                   <p class="help-block text-danger"></p>
+               </div>
+               <div class="form-group">
+                   <input type="email" class="form-control" placeholder="E-Mail Adresse *" id="email" required data-validation-required-message="Bitte E-Mail Adresse eintragen.">
+                   <p class="help-block text-danger"></p>
+               </div>
+               <div class="form-group">
+                   <input type="tel" class="form-control" placeholder="Telefonnummer " id="phone" >
+                   <p class="help-block text-danger"></p>
+               </div>
+           </div>
+           <div class="medium-6 columns">
+               <div class="form-group">
+                   <textarea class="form-control" placeholder="Deine Nachricht *" id="message" required data-validation-required-message="Please enter a message."></textarea>
+                   <p class="help-block text-danger"></p>
+               </div>
+           </div>
+           <div class="large-12 columns text-center">
+             <div class="form-group datenschutz">
+               <input type="checkbox" required data-validation-required-message="Ohne einverständnis können wir die Anfrage nicht verarbeiten!"> ich bin mit dem <a data-toggle="modal" data-target="#myModal">Datenschutz</a> einverstanden.
+             </div>
+           </div>
+           <div class="clearfix"></div>
+           <div class="large-12 columns text-center">
+               <div id="success"></div>
+               <button type="submit" class="btn btn-xl">Absenden</button>
+           </div>
+       </div>
+ </div><!-- #large-12 -->
+</section><!-- #freifunk-description -->
