@@ -783,19 +783,18 @@ if(!wire('user')->isLoggedin()){
   </div>
   <?php } ?>
 
-  <section id="container" class="<?php echo $page->template .' id-'. $id; ?>">
+  <main id="container" class="<?php echo $page->template .' id-'. $id; ?>">
     <?php
       if($input->post->user && $input->post->pass) {
         echo "<div class='alert-box warning' data-alert>" . $session->login_error . "<a href='#' class='close'>&times;</a></div>";
-        }
+      }
       ?>
     <?php
     // Homepage (Landingpage) wird direkt im container
-    echo ($page->id === 1 || $fullwidth == true ? $content :   '<div id="content" class="row">'.$content.'</div>');
+    echo ($page->id === 1 || $fullwidth == true ? $content : '<div id="content" class="row">'.$content.'</div>');
     ?>
-  </section>
-<section>
-</section>
+  </main>
+
   <footer id="footer" class="footer">
     <div class="row">
       <div class="small-12 medium-4 medium-push-8 columns">
@@ -818,12 +817,6 @@ if(!wire('user')->isLoggedin()){
           <li><a href="#">Kontakt</a></li>
         </ul>
         <p class="copywrite">Erstellt mit <a href="http://de.processwire.com/">ProcessWire</a> und <a href="http://foundation.zurb.com/">Foundation Zurb</a>. Zu finden auf <a href="https://github.com/FreifunkMYK/PW-Freifunk-Starter">GitHub</a>.
-      </div>
-    </div>
-    <div class="row">
-      <div class="small-12 medium-2 medium-push-10 columns">
-      </div>
-      <div class="small-12 medium-10 medium-pull-2 columns">
       </div>
     </div>
   </footer>
