@@ -2,16 +2,47 @@
 $ffyellow: #ffb400
 $ffmagenta: #dc0067
 $ffblue: #009ee0
-$main-color: $ffmagenta
+$oil : #333333
+$aluminum : #999999
+$white : #FFFFFF
+$gray: #EFEFEF
+
+// Default Clours
+$primary-color: $ffmagenta
+$secondary-color: #e7e7e7
 $second-color: $ffyellow
 $link-color: $ffblue
+$alert-color: #f04124
+$success-color: #43AC6A
+$warning-color: #f08a24
+$info-color: #a0d3e8
 
 // Mediaquery Brakepoint for Bourbon/Neat
 // new-breakpoint($query, $total-columns: $grid-columns)
-$mobile: new-breakpoint(max-width 760px 4)
-$tablet: new-breakpoint(max-width 980px 12)
-$laptop: new-breakpoint(max-width 1280px 12)
-$sceen: new-breakpoint(min-width 1280px 12)
+$mobile-size: 767px
+$tablet-size: 768px
+$laptop-size: 992px
+$screen-size: 1200px
+$mobile-breakpoint: new-breakpoint(max-width $mobile-size 4)
+$tablet-breakpoint: new-breakpoint(min-width $tablet-size 12)
+$laptop-breakpoint: new-breakpoint(min-width $laptop-size 12)
+$screen-breakpoint: new-breakpoint(min-width $screen-size 12)
+$mobile: $mobile-size - 10px
+$tablet: $tablet-size - 10px
+$laptop: $laptop-size - 10px
+$screen: $screen-size - 10px
+
+// Breadcrumbs
+$crumb-bg: scale-color($secondary-color, $lightness: 55%)
+$crumb-border-size: 0px
+$crumb-function-factor: -10%
+
+// Panel
+$panel-bg: scale-color($white, $lightness: -5%)
+$panel-border-color: scale-color($panel-bg, $lightness: -11%)
+
+// Topbar
+$topbar-height: rem-calc(45)
 
 // Footer
 $footer-bg-color: $oil

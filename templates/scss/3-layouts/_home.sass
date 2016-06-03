@@ -1,0 +1,29 @@
+#home
+  .background-gray
+    background-color: $gray
+  .info
+    +padding(20px null 20px null)
+
+  .container
+    +outer-container()
+    text-align: center
+
+  .feature-cards
+    +span-columns(4)
+    text-align: center
+
+  #mitmachen
+    .feature-cards
+      text-align: left
+
+  #freifunk-faq
+    .faq-set
+      +outer-container()
+      +padding(10px null 20px null)
+    .faq-text
+      text-align: left
+    +media($tablet-breakpoint)
+      .faq-image
+        +span-columns(4)
+      .faq-text
+        +span-columns(8)

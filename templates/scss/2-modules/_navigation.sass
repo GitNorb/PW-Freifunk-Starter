@@ -1,0 +1,38 @@
+header
+  width: 100%
+  background-color: $primary-color
+
+#main-navigation
+  +outer-container()
+  .logo
+    float: left
+  .mobile-nav
+    float: right
+    //+transition(all 2.0s ease-in-out)
+
+#navigation
+  +position(fixed, 0 -190px 0 null)
+  +padding(10px)
+  font-size: 1.2em
+  width: 190px
+  height: 100%
+  z-index: 100
+  background-color: $primary-color
+  overflow-y: auto
+  //+transition(all 2.0s ease-in-out)
+  ul
+    width: 100%
+    float: right
+  li
+    display: block
+    line-height: 2em
+
+
+#sidebartoggle
+  display: none
+
+  &:checked + header
+    #navigation
+      right: 0px
+    .mobile-nav
+      +position(absolute, 5px 210px null null)

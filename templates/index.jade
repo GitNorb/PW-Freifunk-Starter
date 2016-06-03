@@ -1,0 +1,377 @@
+html
+  head
+    
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1.0')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge') 
+    meta(name='description', content='')
+    link(rel='apple-touch-icon', href='apple-touch-icon.png')
+    link(rel='stylesheet', type='text/css', href='/css/app.css')
+    link(rel='icon', type='image/png', href='/img/favicon.png')
+  body#home
+    //if lt IE 8
+      p.browserupgrade
+        | You are using an 
+        strong outdated
+        |  browser. Please 
+        a(href='http://browsehappy.com/') upgrade your browser
+        |  to improve your experience.
+    input#sidebartoggle(type='checkbox', name="sidebartoggle")
+    header#header
+      div#main-navigation
+        .logo
+          h2
+            a(href='https://www.ffmyk.de/')
+              img(src='/img/logo.35x35.png')
+              |            Freifunk-MYK
+          // Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone
+        nav.mobile-nav
+          label(for='sidebartoggle') Menu
+        nav#navigation.navigation.topbar
+          // Right Nav Section
+          ul.right
+            li.active
+              a(href='https://www.ffmyk.de/') Home
+            li
+              a(href='/blog/') Blog
+            li
+              a(href='#') Wiki
+            li.has-dropdown.not-click
+              a(href='/router/') Router
+              ul.dropdown
+                li.parent-link.hide-for-medium-up
+                  a.parent-link.js-generated(href='/router/') Router
+                li
+                  a(href='/router/') Firmware
+            li
+              a(href='#') Karte
+            li.has-dropdown.not-click
+              a(href='#', data-dropdown='signin') Anmelden
+          #signin.f-dropdown.small.content(data-dropdown-content='', aria-autoclose='false')
+            form#formLogin(action='./', method='post')
+              div
+                input#user(name='user', placeholder='Benutzername', type='text')
+                input#pass(name='pass', placeholder='Passwort', type='password')
+              div
+                button#btnLogin.btn.btn-default(type='submit', name='submit', value='Login') Login
+                button#btnRegister.btn.btn-default(type='submit', formaction='https://www.ffmyk.de/registration/') Registrieren
+            a(href='') Password vergessen?
+            // #sticky
+    main
+      section#slider
+        .orbit-container
+          ul.main-orbit.orbit-slides-container(style='height: 759px;', data-orbit='', data-options='resume_on_mouseout:true')
+            li.active(style='z-index: 4;')
+              .slider-image
+                img.img-responsive(src='/img/liebfrauenkirche_2ap.png')
+                h2
+                  span Mit Freifunk mobil sein!
+          a.orbit-prev(href='#')
+            span
+          a.orbit-next(href='#')
+            span
+          .orbit-timer
+            span
+            .orbit-progress(style='width: 25.06%; overflow: hidden;')
+          .orbit-slide-number
+            span 1
+            |  of 
+            span 1
+          .orbit-bullets-container
+            ol.orbit-bullets
+              li.active(data-orbit-slide='0')
+      .second-nav(style='', data-magellan-expedition='fixed')
+        .row
+          .small-12.medium-7.medium-centered.large-6.large-centered.columns
+            dl.sub-nav
+              dd(data-magellan-arrival='freifunk-description')
+                a(href='#freifunk-description') Freifunk
+              dd(data-magellan-arrival='freifunk-faq')
+                a(href='#freifunk-faq') Häufige Fragen
+              dd(data-magellan-arrival='timeline')
+                a(href='#timeline') Timeline
+              dd(data-magellan-arrival='mitmachen')
+                a(href='#mitmachen') Mitmachen
+      section#freifunk-description.info.row(data-magellan-destination='freifunk-description')
+        .container
+          h2 Freifunk
+          h3.subheader
+            small WLAN von Bürgern für Bürger
+          p
+            | Freifunk hat das Ziel ein freies, von Bürgern 
+            |verwaltetes WLAN-Netz aufzubauen. Jeder Nutzer 
+            |im Freifunk-Netz stellt seinen WLAN-Router für 
+            |den Datentransfer der anderen Teilnehmer zur 
+            |Verfügung. Es ist auch möglich den Internetzugang 
+            |zur Verfügung zu stellen und somit anderen den 
+            |Zugang zum weltweiten Netz zu ermöglichen. 
+            |Durch ein sogenanntes Mesh-Netz verbinden sich 
+            |der Freifunk-Router mit allen Freifunk-Routern 
+            |in Reichweite und finden stets die bestmögliche 
+            |Verbindung. So kann es zum Beispiel auch möglich 
+            |sein ins Internet zu gelangen, wenn der eigene 
+            |Anschluss mal gestört sein sollte.
+          .feature-cards
+            span.fa-stack.fa-4x
+              i.fa.fa-circle.fa-stack-2x.text-primary
+              i.fa.fa-wifi.fa-stack-1x.fa-inverse
+            h4 Mesh
+            p
+              | Ein Meshnetz zwischen den Routern sorgt für Stabilität und ermöglicht immer die schnellste Verbindung zum jeweiligen Dienst.
+          .feature-cards
+            span.fa-stack.fa-4x
+              i.fa.fa-circle.fa-stack-2x.text-primary
+              i.fa.fa-lock.fa-stack-1x.fa-inverse
+            h4 Sicherheit
+            p
+              | Das Freifunk-Netz ist vom heimischen Netz getrennt und kann nicht von dort erreicht werden. Mithilfe eines verschlüsselten Tunnels zwischen den Routern und dem Austrittsort ins Internet lässt sich die Verbindung nicht zurück verfolgen.
+          .feature-cards
+            span.fa-stack.fa-4x
+              i.fa.fa-circle.fa-stack-2x.text-primary
+              i.fa.fa-laptop.fa-stack-1x.fa-inverse
+            h4 Mobilität
+            p
+              | Je mehr sich an Freifunk beteiligen, desto Mobiler kann man sich im Freifunk-Netz bewegen. Nehme teil und erweitere das Netzwerk.
+      // #freifunk-description
+      section#freifunk-faq.info.row.background-gray(data-magellan-destination='freifunk-faq')
+        .container
+          h2 Häufige Fragen
+          h3.subheader
+            small in einfachen Worten erklärt!
+          p
+            | Freifunk hat das Ziel ein freies, von Bürgern verwaltetes WLAN-Netz aufzubauen. Jeder Nutzer im Freifunk-Netz stellt seinen WLAN-Router für den Datentransfer der anderen Teilnehmer zur Verfügung. Es ist auch möglich den Internetzugang zur Verfügung zu stellen und somit anderen den Zugang zum weltweiten Netz zu ermöglichen. Durch ein sogenanntes Mesh-Netz verbinden sich der Freifunk-Router mit allen Freifunk-Routern in Reichweite und finden stets die bestmögliche Verbindung. So kann es zum Beispiel auch möglich sein ins Internet zu gelangen, wenn der eigene Anschluss mal gestört sein sollte.
+          .faq-set
+            .faq-image
+              img.responsive(src='https://placehold.it/350x200')
+            .faq-text
+              h4 Freifunk-Router
+              p
+                | Für Freifunk benötigt man einen Router mit einer speziellen Freifunk-Software. Nicht erschrecken, es klingt komplizierter als es ist. Router bekommt man schon ab 15€ und die Software lässt sich bei vielen Modellen so einfach wie ein Firmware Update aufspielen. Auf unseren regelmäßigen Treffen helfen wir gerne bei der Einrichtung und beraten welches Modell sich am besten Eignet.
+                br
+                | Eine gute Übersicht bieten wir auch in unserem Wiki.
+          .faq-set
+            .faq-text
+              h4.text-upper Verbindung zum Internet
+              p
+                | Wenn du deinen Freifunk-Router ans Internet anbindest, baut dieser eine verschlüsselte Verbindung zu einem Verteilknoten auf. Dieser Verteilknoten weiß wo sich die anderen Freifunk-Router befinden und stellt zusätzlich eine verschlüsselte Verbindung zu einem Austrittsort ins Internet.
+                br
+                | Der Austrittsort befindet sich im EU-Ausland oder bei einem Internetprovider, sodass die sonst übliche Störerhaftung nicht zutrifft. Da eine Webseite nur den Austrittsort sieht kann es vorkommen das Google auf Schwedisch oder Holländisch ist da es denkt das man sich dort befindet.
+            .faq-image
+              img.responsive(src='https://placehold.it/350x200')
+          .faq-set
+            .faq-image
+              img.responsive(src='https://placehold.it/350x200')
+            .faq-text
+              h4 Für wen ist Freifunk?
+              p
+                | Mit Freifunk hast du die Möglichkeit deinen Internetanschluss ohne Risiko zur Verfügung zu stellen. Ob deinen Freunden oder den Freunden deiner Kinder, deinen Gäste im Lokal, Hotel oder Club, mit Freifunk kannst du deinen Anschluss unkompliziert und sicher teilen.
+                br
+                | Da Freifunk vom eigenen Heimnetz getrennt ist bleiben deine Daten im Heimischen netz unberührt.
+                br
+                | Doch Freifunk ist nicht nur Internet: Über das Freifunk-Netz lassen sich auch selbst Dienste anbieten, welche auch unabhängig von kommerziellen Anbietern oder auch bei Ausfällen des Internets in der Nachbarschaft erreichbar sind.
+      section#timeline.info.container(data-magellan-destination='timeline')
+        .row
+          .columns.large-12.text-center
+            h2.section-heading Timeline
+            h3.subheader
+              small Unser Weg zum freien Netz.
+        .row
+          .large-12.columns
+            ul.timeline
+              li.timeline-inverted
+                .timeline-image
+                  img.img-circle.img-responsive(src='/site/assets/files/1033/wr843.156x156.png', alt='')
+                .timeline-panel
+                  .timeline-heading
+                    h4  15 Jan 2016 
+                    h4.subheading  First Blogpost
+                  .timeline-body
+                    p.text-muted
+                      | Dies ist der erste Eintrag 
+                      a(href='https://www.ffmyk.de/blog/first-blogpost/') Weiterlesen
+              li.timeline-inverted
+                .timeline-image
+                  h4
+                    | Werde
+                    br
+                    | Teil unserer
+                    br
+                    | Community!
+            // #timelines
+      // #timeline
+      section#mitmachen.info.row.background-gray(data-magellan-destination='mitmachen')
+        .container
+          .text-center
+            h2 Mitmachen
+            h3.subheader
+              small erweitere mit uns das Freifunk Netz
+            p
+              | Gerne kannst du zu einem unserer regelmäßig (jeden 1. Dienstag 19:30) stattfindenden Treffen im Clostersudhaus in der Triererstraße 105 in 56072 Koblenz kommen. Wir beantworten alle Fragen und helfen beim Einrichten neuer Router.
+              | Natürlich hält dich niemand davon ab einfach weiter auf unserer Webseite und im Wiki zu stöbern. Bei Fragen kannst du auch unsere Mailinglist kontaktieren.
+          
+          .feature-cards
+            h2 Starter-Kit
+            h3.subheader
+              small Wohnung, Geschäft, Café, Restaurant, Bar
+            dl
+              dt Du möchtest
+              dd
+                ul
+                  li dich mit dem Freifunk-Netz in deiner Nachbarschaft verbinden.
+                  li deinen Internet-Anschluss freigeben.
+                  li den ersten Freifunk-Router in deiner Umgebung aufstellen.
+              dt So kannst du mitmachen
+              dd
+                ul
+                  li
+                    | Besorge einen Freifunk-fähigen Router. Empfehlungen:
+                    span.description(data-original-title='TP-Link TL-WDR4300, ~70 EUR, 2.4 GHz und 5 GHz.', data-toggle='tooltip', title='') TL-WR-841N
+                    | ,
+                    span.description(data-original-title='TP-Link TL-WR842ND, ~30 EUR, nur 2.4 GHz, etwas knappe 32MB RAM.', data-toggle='tooltip', title='') TL-WDR4300
+                    | .
+                  li
+                    | Falls du deinen Internet-Zugang freigeben möchtest, musst du deinen VPN Key auf unserer Webseite 
+                    a(href='https://www.ffmyk.de/node/add') eintragen
+                    | .
+                    |                   Danach kannst du den Router ans Internet anschließen.
+                    // TODO: Link (wie komme ich an den account?)
+                  li
+                    | Gehe wie im 
+                    a(href='../howto') HowTo
+                    |  beschrieben vor, um die Firmware zu flashen und zu konfigurieren.
+                  li Stelle den Router an einem geeigneten Ort auf (z.B. Fensterbank).
+          .feature-cards
+            h2 Level 2
+            h3.subheader
+              small Balkon, hohes Gebäude, öffentlicher Platz, Park, weitläufiges Gelände
+            dl
+              dt Du möchtest
+              dd
+                ul
+                  li
+                    | das Freifunk-Netz auf ein größeres Gebiet erweitern. Dazu eignen
+                    | sich insbesondere höher gelegene Standorte (z.B. Balkone oder
+                    | Dächer) auf 2.4 GHz.
+                  li
+                    | eine Verbindung zu einem weiter entfernten (bis ~5km)
+                    | Freifunk-Router herstellen. Für stabile Verbindungen wird eine freie
+                    | Sicht zum entfernten Router sowie das 5 GHz-Band benötigt.
+              dt So kannst du mitmachen
+              dd
+                ul
+                  li
+                    | Besorge einen Freifunk-fähigen Outdoor-Router. Empfehlungen:
+                    ul
+                      li
+                        span.description(data-original-title='Ubiquiti NanoStation M2, ~80 EUR, 2.4 GHz, 32MB RAM.', data-toggle='tooltip', title='') NanoStation M2
+                        |  oder
+                        span.description(data-original-title='Ubiquiti NanoStation M2 loco, ~60 EUR, 2.4 GHz, 32MB RAM.', data-toggle='tooltip', title='') M2 loco
+                        |  oder
+                        span.description(data-original-title='TP-Link CPE210, ~50 EUR, 2.4 GHz, 64MB RAM.', data-toggle='tooltip', title='') TL-CPE 210
+                        |  (alle 2.4 GHz)
+                      li
+                        span.description(data-original-title='Ubiquiti NanoStation M5, ~80 EUR, 5 GHz, 32MB RAM.', data-toggle='tooltip', title='') NanoStation M5
+                        |  oder
+                        span.description(data-original-title='Ubiquiti NanoStation M5 loco, ~60 EUR, 5 GHz, 32MB RAM.', data-toggle='tooltip', title='') M5 loco
+                        |  (alle 5 GHz).
+                  li
+                    | Eventuell kannst du diese Hardware im Rahmen einer
+                    a.externalLink(href='https://wiki.freifunk.net/Berlin:%C3%9Cberlassungserkl%C3%A4rung') Überlassungserklärung
+                    |  leihen.
+                  li
+                    | Zur Planung der neuen Verbindungen solltest du mit den Freifunker_innen,
+                    | die die entfernten Router betreiben, 
+                    a(href='../../contact') Kontakt aufnehmen
+                    | .
+          .feature-cards
+            h2 Backbone
+            h3.subheader
+              small Dach, Dachgeschoss, hohes Gebäude, öffentliches Gebäude, Rathaus, Kirchturm...
+            dl
+              dt Du möchtest
+              dd
+                ul
+                  li
+                    | das \"Rückgrat\" des Freifunk-Netzes stärken, indem du stabile
+                    | Richtfunk-Verbindungen zu weit entfernten Freifunk-Routern
+                    | aufbaust (bis ~10km). Für stabile Verbindungen wird eine freie
+                    | Sicht zum entfernten Router benötigt.
+              dt So kannst du mitmachen
+              dd
+                ul
+                  li
+                    | Besorge mehrere Freifunk-fähige Outdoor-Router für 5 GHz.
+                    | Empfehlungen:
+                    ul
+                      li
+                        span.description(data-original-title='Ubiquiti NanoStation M5, ~80 EUR, 5 GHz.', data-toggle='tooltip', title='') NanoStation M5
+                        |  (bis ~5 km)
+                      li
+                        span.description(data-original-title='Ubiquiti NanoBridge M5, ~80 EUR, 5 GHz.', data-toggle='tooltip', title='') NanoBridge M5
+                        |  (bis ~10 km)
+                  li
+                    | Eventuell kannst du diese Hardware im Rahmen einer
+                    a.externalLink(href='https://wiki.freifunk.net/Berlin:%C3%9Cberlassungserkl%C3%A4rung') Überlassungserklärung
+                    |  leihen.
+                  li
+                    | Zur Planung der neuen Verbindungen solltest du mit den Freifunker_innen,
+                    | die die entfernten Router betreiben, 
+                    a(href='../../contact') Kontakt aufnehmen
+                    | .
+    footer.footer-2(role='contentinfo')
+      .footer-logo
+        img(src='https://raw.githubusercontent.com/thoughtbot/refills/49db8c0f2f8066c2c3a275781503fe3303a1a9fc/source/images/placeholder.png', alt='Logo image')
+      ul
+        li
+          a(href='javascript:void(0)') About
+        li
+          a(href='javascript:void(0)') Contact
+        li
+          a(href='javascript:void(0)') Products
+      .footer-secondary-links
+        ul
+          li
+            a(href='javascript:void(0)') Terms and Conditions
+          li
+            a(href='javascript:void(0)') Privacy Policy
+        ul.footer-social
+          li
+            a(href='javascript:void(0)')
+              img(src='https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/facebook-logo-circle.png', alt='Facebook')
+          li
+            a(href='javascript:void(0)')
+              img(src='https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/twitter-logo-circle.png', alt='Twitter')
+          li
+            a(href='javascript:void(0)')
+              img(src='https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/youtube-logo-circle.png', alt='YouTube')
+
+    script(src='/site/templates/js/app-dist.js')
+    script.
+      /*(function() {
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = '/site/templates/js/app-dist.js';
+      var x = document.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+      })();
+      function loadCSS(href){
+      var ss = window.document.createElement('link'),
+      ref = window.document.getElementsByTagName('head')[0];
+      ss.rel = 'stylesheet';
+      ss.href = href;
+      // temporarily, set media to something non-matching to ensure it'll
+      // fetch without blocking render
+      ss.media = 'only x';
+      ref.insertBefore(ss, ref.firstChild);
+      setTimeout( function(){
+      // set media back to `all` so that the stylesheet applies once it loads
+      ss.media = 'all';
+      },0);
+      }
+      loadCSS('/site/templates/css/app.css'); */
+      // Foundation JavaScript
+      // Documentation can be found at: http://foundation.zurb.com/docs
+      $(document).foundation();
+    noscript
+      script(src='/site/templates/js/app-dist.js')
+      link(rel='stylesheet', href='/site/templates/css/app.css')
