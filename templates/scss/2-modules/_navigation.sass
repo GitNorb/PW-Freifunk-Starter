@@ -1,14 +1,16 @@
 header
   width: 100%
   background-color: $primary-color
+  height: 3em
 
 #main-navigation
   +outer-container()
   .logo
     float: left
+    +media($laptop-size)
+      +span-columns(4)
   .mobile-nav
     float: right
-    //+transition(all 2.0s ease-in-out)
 
 #navigation
   +position(fixed, 0 -190px 0 null)
@@ -19,7 +21,6 @@ header
   z-index: 100
   background-color: $primary-color
   overflow-y: auto
-  //+transition(all 2.0s ease-in-out)
   ul
     width: 100%
     float: right
@@ -27,6 +28,23 @@ header
     display: block
     line-height: 2em
 
+  +media($laptop-size)
+    +span-columns(8)
+    overflow-y: none
+    height: 4em
+    ul
+      float: none
+    li
+      display: inline
+      &:hover > ul
+        display: block
+      ul
+        display: none
+
+#mobile-nav
+  +position(absolute, 1em null null null)
+  +media($laptop-size)
+    display: none
 
 #sidebartoggle
   display: none
