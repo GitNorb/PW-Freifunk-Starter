@@ -143,11 +143,13 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
           $new_user->of(true);
         } else {
           // Set new Password
+          $user->of(false);
           $user->pass = $password;
           if($user->isChanged('pass')){
              $user->save();
              $this->message($this->_('Password changed success.'));
            }
+           $user->of(true);
         }
 
         $user = $this->session->login($wireUserName, $password);
