@@ -24,3 +24,4 @@ config.php
 
 ### Sensitive ###
 templates/scripts/node_migration.php
+/.project
