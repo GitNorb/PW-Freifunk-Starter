@@ -19,6 +19,9 @@ $id = $page->id;
 $title = $page->get("headline|title");
 $fullwidth = false;
 
+//time settings
+setlocale (LC_ALL, 'de_DE.UTF-8');
+
 // set a couple new fields that our output will use
 $page->set('authorURL', wire('config')->urls->root . 'profile/' . $page->createdUser->name . '/');
 $page->set('authorName', wire('page')->createdUser->get('name|title') );

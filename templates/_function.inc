@@ -283,12 +283,12 @@ function renderPageName($title){
 }
 
 function renderNewNodesList(){
-  $nodes = wire('pages')->find("template=node, sort=date, limit=5");
+  $nodes = wire('pages')->find("template=node, sort=-date, limit=10");
   $list = "";
-  foreach($node as $nodes){
-    $list .= "<li>{$node->title} - {$node->location}</li>";
+  foreach($nodes as $node){
+    $list .= "<li>{$node->get('subtitle|title')}</li>";
   }
-  $output = "<ul class='node-list'>$list</ul>";
+  $output = "<h4>Neuste Nodes</h4><ul class='node-list'>$list</ul>";
   return $output;
 }
 
