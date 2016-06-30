@@ -10,8 +10,8 @@
       <?=$image?>
     </div>
     <div class='medium-9 columns'>
-      <h4 class='tobheader'><small><?=$page->date?></small></h4>
-      <h3><?=$page->title?></h3>
+      <h4 class='tobheader'><small><?php echo strftime('%d %b %Y', $page->getUnformatted('date'))?></small></h4>
+      <h1><?=$page->title?></h1>
       <p>
         <?=$page->get('body|summary')?>
       </p>
@@ -29,5 +29,5 @@
     </p>
     <a href='#' class='button expand'>Informier dich jetzt!</a>
   </div>
-  <?=renderNewNodesList();?>
+  <?php echo renderNewNodesList(); ?>
 </div>

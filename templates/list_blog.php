@@ -12,7 +12,7 @@ foreach($posts as $post){
                   $image
                 </div>
                 <div class='medium-9 columns'>
-                  <h4 class='tobheader'><small>{$post->date}</small></h4>
+                  <h4 class='tobheader'><small>". strftime('%d %b %Y', $post->getUnformatted('date')) ."</small></h4>
                   <a href='{$post->httpUrl}'><h3>{$post->title}</h3></a>
                   <p>
                       {$post->get('body|summary')}
