@@ -53,6 +53,62 @@ function getTag(PageArray $tags, $limit = 0){
 ###################################################
 # Render
 ####################################################
+function renderPage($template = "") {
+  if(empty($template)) $template = wire('page')->template;
+  $config = wire('config');
+
+  //Create delegate template
+  $template = new TemplateFile($config->paths->templates . "markup/$template.inc");
+
+  //Get the output and save it on $out.
+  return $template->render();
+}
+
+/* Alternative zur obigen Lösung:
+function renderPage($posts = "", $small = false){
+  if(!$posts instanceof PageArray){
+    if($posts instanceof Page){
+      $post = $posts;
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(empty($posts)){
+      $post = wire('page');
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(is_string($posts)){
+      // selector string
+      $selector = $posts;
+      $posts = wire('pages')->find("$selector");
+    }
+  }
+
+  $out = '';
+  foreach ($posts as $p) {
+    switch($p->template){
+      case 'post':
+        $out .= renderPost($p, $small);
+        break;
+      case 'node':
+        $out .= renderEvent($p, $small);
+        break;
+      case 'router':
+        $out .= renderRouter($p, $small);
+        break;
+      case 'profile':
+        $out .= renderProfile($p, $small);
+        break;
+    }
+  }
+
+  if($posts->getLimit() < $posts->getTotal()) $out .= $posts->renderPager(array(
+    'nextItemLabel' => "Ältere Artikel",
+    'previousItemLabel' => "Neure Artikel",
+  ));
+
+  return $out;
+}
+*/
+
 function renderCopyrights(Page $page) {
 
     if (!$page->summary) return '';
@@ -155,17 +211,6 @@ function renderOnPageBlocks() {
     return $out;
 }
 
-function renderPage($template = "") {
-  if(empty($template)) $template = wire('page')->template;
-  $config = wire('config');
-
-  //Create delegate template
-  $template = new TemplateFile($config->paths->templates . "markup/$template.inc");
-
-  //Get the output and save it on $out.
-  return $template->render();
-}
-
 /* Rendern der Infoblocks von Router */
 function renderInfoBlocks() {
 
@@ -235,6 +280,16 @@ function renderPageName($title){
 	$string = $sanitizer->pageName($string);
 
 	return $string;
+}
+
+function renderNewNodesList(){
+  $nodes = wire('pages')->find("template=node, sort=date, limit=5");
+  $list = "";
+  foreach($node as $nodes){
+    $list .= "<li>{$node->title} - {$node->location}</li>";
+  }
+  $output = "<ul class='node-list'>$list</ul>";
+  return $output;
 }
 
 ##########################################################

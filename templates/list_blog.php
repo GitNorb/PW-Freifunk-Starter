@@ -5,11 +5,11 @@ $output = '';
 $posts = $pages->find("template=post,sort=-date");
 
 foreach($posts as $post){
-  $image = (count($post->images) ? $post->images->first()->size(300,200)->url : "https://placehold.it/200x130");
+  $image = (count($post->images) ? "<img class='responsive' src='{$post->images->first()->size(300,200)->url}'></img>" : "");
 
   $output .= "<article id='article-{$post->id}' class='row article'>
                 <div class='medium-3 columns'>
-                  <img class='responsive' src='$image'></img>
+                  $image
                 </div>
                 <div class='medium-9 columns'>
                   <h4 class='tobheader'><small>{$post->date}</small></h4>
