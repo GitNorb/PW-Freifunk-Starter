@@ -50,6 +50,7 @@ $page->nodes = $pages->find("template=node, operator={$u->id}");
 // IPs
 $page->ips = $pages->find("template=staticip, operator={$u->id}");
 
+$liste = "";
 $userlist = $users->find("start=0, name!='guest'");
 foreach($userlist as $uli){
   $liste .= "<li><a href='{$pages->get('/profile/')->httpUrl}{$uli->name}'>$uli->name</a></li>";
