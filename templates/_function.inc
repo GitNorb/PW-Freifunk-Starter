@@ -53,6 +53,62 @@ function getTag(PageArray $tags, $limit = 0){
 ###################################################
 # Render
 ####################################################
+function renderPage($template = "") {
+  if(empty($template)) $template = wire('page')->template;
+  $config = wire('config');
+
+  //Create delegate template
+  $template = new TemplateFile($config->paths->templates . "markup/$template.inc");
+
+  //Get the output and save it on $out.
+  return $template->render();
+}
+
+/* Alternative zur obigen Lösung:
+function renderPage($posts = "", $small = false){
+  if(!$posts instanceof PageArray){
+    if($posts instanceof Page){
+      $post = $posts;
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(empty($posts)){
+      $post = wire('page');
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(is_string($posts)){
+      // selector string
+      $selector = $posts;
+      $posts = wire('pages')->find("$selector");
+    }
+  }
+
+  $out = '';
+  foreach ($posts as $p) {
+    switch($p->template){
+      case 'post':
+        $out .= renderPost($p, $small);
+        break;
+      case 'node':
+        $out .= renderEvent($p, $small);
+        break;
+      case 'router':
+        $out .= renderRouter($p, $small);
+        break;
+      case 'profile':
+        $out .= renderProfile($p, $small);
+        break;
+    }
+  }
+
+  if($posts->getLimit() < $posts->getTotal()) $out .= $posts->renderPager(array(
+    'nextItemLabel' => "Ältere Artikel",
+    'previousItemLabel' => "Neure Artikel",
+  ));
+
+  return $out;
+}
+*/
+
 function renderCopyrights(Page $page) {
 
     if (!$page->summary) return '';
@@ -92,12 +148,13 @@ function renderTimeline($timeline){
   $config = wire('config');
 
   foreach($timeline as $post){
+    $image = $post->images->first();
     $t = new TemplateFile($config->paths->templates . "markup/timeline_block.inc");
     $t->set('title', $post->date);
     $t->set('subtitle', $post->title);
     $t->set('summary', $post->summary);
     $t->set('image', $post->images->first()->size(156,156)->url);
-    $t->set('image_description', $post->image->description);
+    $t->set('image_description', $image->description);
     $t->set('readmore', $post->httpUrl);
     $t->set('leftright', ($count % 2 != 0 ? "" : "class='timeline-inverted'"));
 
@@ -153,17 +210,6 @@ function renderOnPageBlocks() {
     }
 
     return $out;
-}
-
-function renderPage($template = "") {
-  if(empty($template)) $template = wire('page')->template;
-  $config = wire('config');
-
-  //Create delegate template
-  $template = new TemplateFile($config->paths->templates . "markup/$template.inc");
-
-  //Get the output and save it on $out.
-  return $template->render();
 }
 
 /* Rendern der Infoblocks von Router */
@@ -235,6 +281,16 @@ function renderPageName($title){
 	$string = $sanitizer->pageName($string);
 
 	return $string;
+}
+
+function renderNewNodesList(){
+  $nodes = wire('pages')->find("template=node, sort=-created, limit=10");
+  $list = "";
+  foreach($nodes as $node){
+    $list .= "<li>{$node->get('subtitle|title')}</li>";
+  }
+  $output = "<h4>Neuste Nodes</h4><ul class='node-list'>$list</ul>";
+  return $output;
 }
 
 ##########################################################

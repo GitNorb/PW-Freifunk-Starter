@@ -1,16 +1,16 @@
 <?php
 
-class ffNodeInfo extends WireData implements Module, ConfigurableModule{
+class ffFirmwareLoad extends WireData implements Module, ConfigurableModule{
     protected $cache = false;
     protected $cache_node = array();
     protected $src, $nodes;
 
     public static function getModuleInfo() {
         return array(
-            'title' => __('FF Node Info'),
-            'version' => '002',
+            'title' => __('FF Firmware Listing'),
+            'version' => '001',
             'author' => 'Kreativmonkey',
-            'summary' => __('Save node information for Freifunk'),
+            'summary' => __('Load the list of Firmware for each Router'),
             'singular' => true,
             'autoload' => true
         );
@@ -89,15 +89,14 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
         }
 
         $data = array(
-            'addresses' => (property_exists($info, 'addresses') ? $info->nodeinfo->network->addresses : null),
-            'hardware' => (property_exists($info, 'hardware') ? $info->nodeinfo->hardware->model : null),
+            'addresses' => $info->nodeinfo->network->addresses,
+            'hardware' => $info->nodeinfo->hardware->model,
             'firmware' => $info->nodeinfo->software->firmware->release,
-            'autoupdater_state' => (property_exists($info, 'autoupdater') ? $info->nodeinfo->software->autoupdater->enabled : "false" ),
+            'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
             'name' => $info->nodeinfo->hostname,
             'lastseen' => $info->lastseen,
-            'geo' => array( 'latitude' => (property_exists($info, 'location') ? $info->nodeinfo->location->latitude : null),
-                            'longitude' => (property_exists($info, 'location') ? $info->nodeinfo->location->longitude : null),
-                          ),
+            'geo' => array( 'latitude' => $info->nodeinfo->location->latitude,
+                            'longitude' => $info->nodeinfo->location->longitude),
             'ip' => $ip,
             'online' => $info->flags->online
         );

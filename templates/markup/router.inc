@@ -11,7 +11,7 @@
       <p>
         Im Folgenden findest du die Firmware zum Router. Für den produktiven - also möglichst ausfallsicheren - Betrieb solltest du die Stable Firmware nutzen. Diese wird vor der Veröffentlichung getestet und enthält meistens keine Fehler mehr.
       </p>
-      <?=$this->firmware?>
+      <?=$page->firmwareTable?>
     </div><!-- #columns large-9 -->
     <div id='router-infobox' class='large-3 columns'>
       <div class='panel'>

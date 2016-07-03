@@ -86,7 +86,6 @@ if($input->urlSegment1){
                   map.on('click', function(e){
                     alert('Geoposition = ' + e.latlng);
                   })
-
                   $('#map').height($(window).height() - 205).width($(window).width());
                     map.invalidateSize();
                   </script>";
@@ -101,7 +100,7 @@ if($input->urlSegment1){
         if(isset($input->get->key)) $session->key = $sanitizer->text($input->get->key);
       } elseif(!$input->post->submit) {
         if(isset($input->get->mac)) $session->mac = $sanitizer->text($input->get->mac);
-        if(isset($input->get->key)) $session->key = $sanitizer->text($input->get->key);
+        if(isset($input->get->key)) $session->key = strtoupper($sanitizer->text($input->get->key));
         $content = renderPage('node_registration');
       } else {
         //  Register Node
@@ -120,7 +119,7 @@ if($input->urlSegment1){
 
           foreach($nodes as $node){
                 $router_new[] = array('MAC' => "$node->title",
-                                  'PublicKey' => "$node->key");
+                                  'PublicKey' => strtoupper($node->key));
           }
 
           $list = array_merge($router_old, $router_new);
