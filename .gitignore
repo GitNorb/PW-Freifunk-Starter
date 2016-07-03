@@ -24,4 +24,5 @@ config.php
 
 ### Sensitive ###
 templates/scripts/node_migration.php
+templates/prepros.cfg
 /.project
