@@ -39,7 +39,7 @@ function isActive(Page $page, Page $nav){
         <a href="<?=$pages->get("/blog/")->url?>">Blog</a>
       </li>
       <li><a href="#">Wiki</a></li>
-      <li <?php echo (isActive($page, $pages->get("/router/")) ? "class='active'" : "class='has-dropdown'"); ?>>
+      <li <?php echo (isActive($page, $pages->get("/router/")) ? "class='active'" : "class=''"); ?>>
         <a href="<?=$pages->get("/router/")->url?>">Router</a>
       </li>
       <li><a href="#">Karte</a></li>
