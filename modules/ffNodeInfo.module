@@ -8,7 +8,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     public static function getModuleInfo() {
         return array(
             'title' => __('FF Node Info'),
-            'version' => '001',
+            'version' => '002',
             'author' => 'Kreativmonkey',
             'summary' => __('Save node information for Freifunk'),
             'singular' => true,
@@ -89,14 +89,15 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
         }
 
         $data = array(
-            'addresses' => $info->nodeinfo->network->addresses,
-            'hardware' => $info->nodeinfo->hardware->model,
+            'addresses' => (property_exists($info, 'addresses') ? $info->nodeinfo->network->addresses : null),
+            'hardware' => (property_exists($info, 'hardware') ? $info->nodeinfo->hardware->model : null),
             'firmware' => $info->nodeinfo->software->firmware->release,
-            'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
+            'autoupdater_state' => (property_exists($info, 'autoupdater') ? $info->nodeinfo->software->autoupdater->enabled : "false" ),
             'name' => $info->nodeinfo->hostname,
             'lastseen' => $info->lastseen,
-            'geo' => array( 'latitude' => $info->nodeinfo->location->latitude,
-                            'longitude' => $info->nodeinfo->location->longitude),
+            'geo' => array( 'latitude' => (property_exists($info, 'location') ? $info->nodeinfo->location->latitude : null),
+                            'longitude' => (property_exists($info, 'location') ? $info->nodeinfo->location->longitude : null),
+                          ),
             'ip' => $ip,
             'online' => $info->flags->online
         );
