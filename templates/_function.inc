@@ -287,7 +287,7 @@ function renderNewNodesList(){
   $nodes = wire('pages')->find("template=node, sort=-created, limit=10");
   $list = "";
   foreach($nodes as $node){
-    $list .= "<li>{$node->get('subtitle|title')}</li>";
+    $list .= "<li>{$node->get('subtitle|title')}<br/>{$node->address}TEST</li>";
   }
   $output = "<h4>Neuste Nodes</h4><ul class='node-list'>$list</ul>";
   return $output;
