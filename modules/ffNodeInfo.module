@@ -75,18 +75,20 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
         $this->message("Node Informationen aktualisiert");
     }
 
-    public function get_address($latitude, $longitude){
+    /*public function get_address($latitude, $longitude){
 
-      /* if ($node->isChanged('latitude') ||
-        $node->isChanged('longitude') ||
-        empty($node->address)){
-        $node->address = get_address($node->latitude, $node->longitude);
+      // not hear!!
+      if ($node->isChanged('latitude') ||
+          $node->isChanged('longitude') ||
+          empty($node->address)){
+          $node->address = get_address($node->latitude, $node->longitude);
+        }
       }
-    }*/
+
       $data = json_decode(file_get_contents("https://nominatim.openstreetmap.org/reverse?format=json&lat={$latitude}&lon={$longitude}&zoom=16&addressdetails=1&email=info@freifunk-myk.de"));
       $address = $data->address->town .", ".$data->address->road;
       return $address;
-    }
+    }*/
 
     public function get_nodeinfo($mac) {
         $mac = strtoupper(str_replace(':', '', $mac));
@@ -109,8 +111,8 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
             'name' => $info->nodeinfo->hostname,
             'lastseen' => $info->lastseen,
-            'geo' => array( 'latitude' => $info->nodeinfo->location->latitude->latitude,
-                            'longitude' => $info->nodeinfo->location->longitude->longitude,
+            'geo' => array( 'latitude' => $info->nodeinfo->location->latitude,
+                            'longitude' => $info->nodeinfo->location->longitude,
                           ),
             'ip' => $ip,
             'online' => $info->flags->online
