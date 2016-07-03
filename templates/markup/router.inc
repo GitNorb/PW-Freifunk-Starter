@@ -2,6 +2,9 @@
   <div class='row'>
     <div class='large-9 columns'>
       <h1><?=$page->get('headline|title')?></h1>
+      <?php if(wire('user')->hasPermission('page-edit', $page)){ ?>
+        <a class="edit" href="<?=$pages->get(1)->httpUrl?>processwire/page/edit/?id=<?=$page->id?>"><i class="fa fa-pencil"></i></a>
+      <?php } ?>
       <p>
       <?=$page->body?>
       </p>

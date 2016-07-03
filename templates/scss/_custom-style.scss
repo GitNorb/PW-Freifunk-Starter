@@ -36,6 +36,16 @@ $footer-link: true;
 #article, #sidebar{
   margin-top: $topbar-height;
 }
+a.edit{
+  position: absolute;
+  top: 25px;
+  right: 20px;
+  font-size: 1.3em;
+  color: #efefef;
+}
+article:hover a.edit{
+  color: rgba(0, 120, 160, 0.62);
+}
 .article{
   margin-bottom: $topbar-height !important;
   h3{
