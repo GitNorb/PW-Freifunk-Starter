@@ -38,11 +38,11 @@ function isActive(Page $page, Page $nav){
       <li <?php echo (isActive($page, $pages->get("/blog/")) ? "class='active'" : ""); ?> >
         <a href="<?=$pages->get("/blog/")->url?>">Blog</a>
       </li>
-      <li><a href="#">Wiki</a></li>
+      <li><a href="https://wiki.freifunk-myk.de">Wiki</a></li>
       <li <?php echo (isActive($page, $pages->get("/router/")) ? "class='active'" : "class=''"); ?>>
         <a href="<?=$pages->get("/router/")->url?>">Router</a>
       </li>
-      <li><a href="#">Karte</a></li>
+      <li><a href="https://status.freifunk-myk.de">Karte</a></li>
       <li class="has-dropdown">
         <?php if(!wire('user')->isLoggedin()){ ?>
           <a href="#" data-dropdown="signin">Anmelden</a>

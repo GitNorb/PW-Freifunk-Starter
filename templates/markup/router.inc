@@ -12,7 +12,10 @@
       <?=renderInfoBlocks();?>
       <h2>Firmware</h2>
       <p>
-        Im Folgenden findest du die Firmware zum Router. Für den produktiven - also möglichst ausfallsicheren - Betrieb solltest du die Stable Firmware nutzen. Diese wird vor der Veröffentlichung getestet und enthält meistens keine Fehler mehr.
+        Im Folgenden findest du die Firmware zum Router.
+        Für den produktiven - also möglichst ausfallsicheren - Betrieb solltest du die Stable Firmware nutzen.
+        Diese wird vor der Veröffentlichung getestet und enthält meistens keine Fehler mehr.
+        Eine Anleitung zum Flashen findest du in unserem <a href="https://wiki.freifunk-myk.de/wiki/anleitung">Wiki</a>.
       </p>
       <?=$page->firmwareTable?>
     </div><!-- #columns large-9 -->
