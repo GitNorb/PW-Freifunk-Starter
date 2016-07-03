@@ -148,12 +148,13 @@ function renderTimeline($timeline){
   $config = wire('config');
 
   foreach($timeline as $post){
+    $image = $post->images->first();
     $t = new TemplateFile($config->paths->templates . "markup/timeline_block.inc");
     $t->set('title', $post->date);
     $t->set('subtitle', $post->title);
     $t->set('summary', $post->summary);
     $t->set('image', $post->images->first()->size(156,156)->url);
-    $t->set('image_description', $post->image->description);
+    $t->set('image_description', $image->description);
     $t->set('readmore', $post->httpUrl);
     $t->set('leftright', ($count % 2 != 0 ? "" : "class='timeline-inverted'"));
 
