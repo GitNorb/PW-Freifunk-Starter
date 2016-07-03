@@ -1,7 +1,7 @@
 <article id='article' class='large-12 columns'>
   <div class='row'>
     <div class='large-9 columns'>
-      <h1><?=$page->parent->title?> <?=$page->title?></h1>
+      <h1><?=$page->get('headline|title')?></h1>
       <p>
       <?=$page->body?>
       </p>
@@ -18,8 +18,12 @@
         <img class='responsive' src='<?php echo (count($page->image) ? $page->image->first()->size(250,250)->url : 'https://placehold.it/250x250?text=No Image'); ?>'> </img>
 
         <hr>
-        Hersteller: <a href='<?=$page->parent->website?>'><?=$page->parent->title?></a><br/>
-        OpenWrt: <a href='https://wiki.openwrt.org/toh/<?=$page->parent->name?>/<?=$page->name?>"><?=$page->title?></a><br/>
+        Hersteller: <?php if($page->parent->website){ ?>
+                      <a href='<?=$page->parent->website?>'><?=$page->parent->title?></a>
+                    <?php } else { ?>
+                      <?=$page->parent->title?>
+                    <?php } ?><br/>
+        OpenWrt: <a href="https://wiki.openwrt.org/toh/<?=strtolower($page->parent->title)?>/<?=strtolower($page->title)?>"><?=$page->title?></a><br />
         <hr>
         <h4>Features</h4>
         <ul class='features'>

@@ -40,4 +40,6 @@ $table->set('betaFactory', $betaSysupgrade);
 
 $page->set('firmwareTable', $table->render());
 
+$page->set('headline', $page->parent->title ." ". $page->title);
+
 $content = renderPage();

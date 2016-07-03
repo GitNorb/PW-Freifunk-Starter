@@ -59,7 +59,7 @@ if(!wire('user')->isLoggedin()){
       foreach($config->styles as $key => $file) echo "\n\t<link rel='stylesheet' type='text/css' href='$file'>";
     }
   ?>
-  <title><?php echo $page->title . " &middot; " . $homepage->headline; ?></title>
+  <title><?php echo $page->get('headline|title') . " &middot; " . $homepage->headline; ?></title>
 
   <link rel="icon" type="image/png" href='<?= $config->urls->templates. 'img/favicon.png' ?>'>
   <meta charset="utf-8" />
