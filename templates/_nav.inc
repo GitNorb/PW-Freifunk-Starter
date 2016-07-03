@@ -61,10 +61,17 @@ function isActive(Page $page, Page $nav){
             <li>
               <a href="<?= $pages->get('/static-ip/')->httpURL ?>"><i class='fa fa-server'></i> Statische IPs</a>
             </li>
+            <?php if(wire('user')->hasPermission('page-create')) { ?>
+              <li>
+                <a href="<?=$pages->get(1)->httpUrl?>processwire/page/add/?parent_id=1025"><i class='fa fa-plus'></i> Neuer Blogpost</a>
+              </li>
+            <?php  } ?>
             <?php if(wire('user')->hasRole('superuser') || wire('user')->hasRole('admin') || wire('user')->hasRole('manager')){ ?>
               <li>
                 <a href="<?=$pages->get(1)->httpUrl?>processwire"><i class='fa fa-cogs'></i> Admin</a>
               </li>
+            <?php }
+            if(wire('user')->hasPermission('page-edit', $page)) { ?>
               <li>
                 <a href="<?=$pages->get(1)->httpUrl?>processwire/page/edit/?id=<?=$page->id?>"><i class='fa fa-pencil'></i> Edit Page</a>
               </li>
