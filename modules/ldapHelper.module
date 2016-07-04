@@ -121,7 +121,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       $user_entry = ldap_first_entry($con, $user_search);
       $user_dn = ldap_get_dn($con, $user_entry);
 
-      if(ldap_bind($con, $user_dn, $password)){
+      if(@ldap_bind($con, $user_dn, $password)){
         $wireUserName = $this->sanitizer->pageName($username);
 
         $user = $this->users->get("name=$wireUserName");
