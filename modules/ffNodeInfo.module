@@ -8,7 +8,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     public static function getModuleInfo() {
         return array(
             'title' => __('FF Node Info'),
-            'version' => '002',
+            'version' => '004',
             'author' => 'Kreativmonkey',
             'summary' => __('Save node information for Freifunk'),
             'singular' => true,
@@ -63,15 +63,18 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             $node->ipv6 = $data['ip'];
             $node->online = $data['online'];
             if ($node->isChanged('latitude') ||
-                $node->isChanged('longitude') ||
-                $node->address == ", "){
+                $node->isChanged('longitude')
+                && isset($node->latitude)){
+                echo $node->title .": ". $node->address ."<br/>";
                 $node->address = $this->get_address($node->latitude, $node->longitude);
               }
           } else {
             $node->online = false;
           }
-
-          $node->save();
+          if($node->isChanged()){
+            // Save only if the Page has Changes
+            $node->save();
+          }
           $node->of(true);
         }
 
@@ -80,8 +83,22 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
 
     public function get_address($latitude, $longitude){
       if(empty($latitude)) return;
+      echo "look for address: ". $latitude .":".$longitude ."<br/>";
       $osm = json_decode(file_get_contents("https://nominatim.openstreetmap.org/reverse?format=json&lat={$latitude}&lon={$longitude}&zoom=16&addressdetails=1&email=info@freifunk-myk.de"));
-      $address = ($osm->address->city ? $osm->address->city .", ".$osm->address->road : "");
+      if(isset($osm->address->city)) {
+        $address = $osm->address->city;
+      } elseif (isset($osm->address->city_district)){
+        $address = $osm->address->city_district;
+      }elseif (isset($osm->address->town)) {
+        $address = $osm->address->town;
+      } elseif (isset($osm->address->village)) {
+        $address = $osm->address->village;
+      } else {
+        $address = "";
+      }
+      if(isset($osm->address->road) && isset($address)){
+        $address .= ", ".$osm->address->road;
+      }
       return $address;
     }
 
@@ -100,14 +117,14 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
         }
 
         $data = array(
-            'addresses' => $info->nodeinfo->network->addresses,
-            'hardware' => $info->nodeinfo->hardware->model,
-            'firmware' => $info->nodeinfo->software->firmware->release,
-            'autoupdater_state' => $info->nodeinfo->software->autoupdater->enabled,
-            'name' => $info->nodeinfo->hostname,
-            'lastseen' => $info->lastseen,
-            'geo' => array( 'latitude' => $info->nodeinfo->location->latitude,
-                            'longitude' => $info->nodeinfo->location->longitude,
+            'addresses' => (isset($info->nodeinfo->network->addresses) ? $info->nodeinfo->network->addresses : ""),
+            'hardware' => (isset($info->nodeinfo->hardware->model) ? $info->nodeinfo->hardware->model : "empty"),
+            'firmware' => (isset($info->nodeinfo->software->firmware->release) ? $info->nodeinfo->software->firmware->release : ""),
+            'autoupdater_state' => (isset($info->nodeinfo->software->autoupdater->enabled) ? $info->nodeinfo->software->autoupdater->enabled : ""),
+            'name' => (isset($info->nodeinfo->hostname) ? $info->nodeinfo->hostname : ""),
+            'lastseen' => (isset($info->lastseen) ? $info->lastseen : ""),
+            'geo' => array( 'latitude' => (isset($info->nodeinfo->location->latitude) ? $info->nodeinfo->location->latitude : ""),
+                            'longitude' => (isset($info->nodeinfo->location->longitude) ? $info->nodeinfo->location->longitude : ""),
                           ),
             'ip' => $ip,
             'online' => $info->flags->online
