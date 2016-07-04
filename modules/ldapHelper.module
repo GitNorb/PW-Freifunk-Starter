@@ -8,7 +8,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
     public static function getModuleInfo() {
         return array(
             'title' => __('LDAP Helper'),
-            'version' => '005',
+            'version' => '006',
             'author' => 'Kreativmonkey',
             'summary' => __('Hendle LDAP Communication for Processwire'),
             'singular' => true,
