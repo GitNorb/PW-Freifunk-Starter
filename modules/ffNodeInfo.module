@@ -8,7 +8,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     public static function getModuleInfo() {
         return array(
             'title' => __('FF Node Info'),
-            'version' => '004',
+            'version' => '005',
             'author' => 'Kreativmonkey',
             'summary' => __('Save node information for Freifunk'),
             'singular' => true,
@@ -63,9 +63,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             $node->ipv6 = $data['ip'];
             $node->online = $data['online'];
             if ($node->isChanged('latitude') ||
-                $node->isChanged('longitude')
-                && isset($node->latitude)){
-                echo $node->title .": ". $node->address ."<br/>";
+                $node->isChanged('longitude')){
                 $node->address = $this->get_address($node->latitude, $node->longitude);
               }
           } else {
@@ -78,12 +76,11 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
           $node->of(true);
         }
 
-        $this->message("Node Informationen aktualisiert");
+        $this->message(__('Node Informationen aktualisiert'));
     }
 
     public function get_address($latitude, $longitude){
-      if(empty($latitude)) return;
-      echo "look for address: ". $latitude .":".$longitude ."<br/>";
+      if(empty($latitude)) return "";
       $osm = json_decode(file_get_contents("https://nominatim.openstreetmap.org/reverse?format=json&lat={$latitude}&lon={$longitude}&zoom=16&addressdetails=1&email=info@freifunk-myk.de"));
       if(isset($osm->address->city)) {
         $address = $osm->address->city;
@@ -94,7 +91,8 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
       } elseif (isset($osm->address->village)) {
         $address = $osm->address->village;
       } else {
-        $address = "";
+        $address = __('no address found');
+        $this->log->error(sprintf(__('no address found for %s:%s'), $latitude, $longitude));
       }
       if(isset($osm->address->road) && isset($address)){
         $address .= ", ".$osm->address->road;
