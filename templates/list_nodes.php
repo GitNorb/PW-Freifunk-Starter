@@ -1,6 +1,10 @@
 <?php
 include_once('scripts/node_migration.php');
 
+/*$ffinfo = $modules->get('ffNodeInfo');
+$e = new HookEvent;
+$ffinfo->set_nodeinfo($e);*/
+
 if($input->urlSegment2) throw new Wire404Exception();
 
 if($input->urlSegment1){

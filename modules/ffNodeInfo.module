@@ -44,7 +44,6 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     public function set_nodeinfo(HookEvent $e){
         $this->cache_data();
         $nodes = wire('pages')->find("template=node, key!=''");
-
         foreach($nodes as $node){
           $data = $this->get_nodeinfo($node->title);
 
@@ -56,14 +55,18 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             } elseif($data['name'] != 'unbekannt') {
               $node->subtitle = $data['name'];
             }
-            $node->latitude = $data['geo']['latitude'];
-            $node->longitude = $data['geo']['longitude'];
+            $node->latitude = str_replace(',', '.', $data['geo']['latitude']);
+            $node->longitude = str_replace(',', '.', $data['geo']['longitude']);
             $node->lastseen = strtotime($data['lastseen']);
             $node->node_hardware = $data['hardware'];
             $node->node_firmware = $data['firmware'];
             $node->ipv6 = $data['ip'];
             $node->online = $data['online'];
-
+            if ($node->isChanged('latitude') ||
+                $node->isChanged('longitude') ||
+                $node->address == ", "){
+                $node->address = $this->get_address($node->latitude, $node->longitude);
+              }
           } else {
             $node->online = false;
           }
@@ -75,20 +78,12 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
         $this->message("Node Informationen aktualisiert");
     }
 
-    /*public function get_address($latitude, $longitude){
-
-      // not hear!!
-      if ($node->isChanged('latitude') ||
-          $node->isChanged('longitude') ||
-          empty($node->address)){
-          $node->address = get_address($node->latitude, $node->longitude);
-        }
-      }
-
-      $data = json_decode(file_get_contents("https://nominatim.openstreetmap.org/reverse?format=json&lat={$latitude}&lon={$longitude}&zoom=16&addressdetails=1&email=info@freifunk-myk.de"));
-      $address = $data->address->town .", ".$data->address->road;
+    public function get_address($latitude, $longitude){
+      if(empty($latitude)) return;
+      $osm = json_decode(file_get_contents("https://nominatim.openstreetmap.org/reverse?format=json&lat={$latitude}&lon={$longitude}&zoom=16&addressdetails=1&email=info@freifunk-myk.de"));
+      $address = ($osm->address->city ? $osm->address->city .", ".$osm->address->road : "");
       return $address;
-    }*/
+    }
 
     public function get_nodeinfo($mac) {
         $mac = strtoupper(str_replace(':', '', $mac));
