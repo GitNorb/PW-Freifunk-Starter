@@ -5,6 +5,8 @@
  */
 class NodeInfo extends WireData {
 
+	const dateFormat = 'Y-m-d';
+
   protected $page;
 
   public function __construct() {
@@ -85,7 +87,7 @@ class NodeInfo extends WireData {
     $of = $this->page->of();
     // turn on output formatting for our rendering (if it's not already on)
     if(!$of) $this->page->of(true);
-    $out = "<p><strong>$this->date</strong><br /><em>$this->ipv6</em><br />$this->address</p>";
+    $out = "<p><strong>$this->lastconnect</strong><br /><em>$this->ipv6</em><br />$this->address</p>";
     if(!$of) $this->page->of(false);
     return $out;
   }

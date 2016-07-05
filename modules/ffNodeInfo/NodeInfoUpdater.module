@@ -73,7 +73,7 @@ class NodeInfoUpdater extends WireData implements Module, ConfigurableModule{
                 $nodeinfo->address = $this->get_address($nodeinfo->latitude, $nodeinfo->longitude);
               }
           } else {
-            $nodeinfo->online = false;
+            $nodeinfo->online = 0;
           }
           if($node->isChanged()){
             // Save only if the Page has Changes

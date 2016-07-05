@@ -50,10 +50,10 @@ class NodeInfoUpdater extends WireData implements Module, ConfigurableModule{
 
           // get a data array with the information of the Node
           $data = $this->get_nodeinfo($node->title);
+          $nodeinfo = $node->nodeinfo;
 
           $node->of(false);
           if(!empty($data)){
-            $nodeinfo = $node->nodeinfo;
 
             // Override exist name only if a new one.
             if($data['name'] == 'unbekannt' && empty($node->subtitle)){
@@ -68,12 +68,12 @@ class NodeInfoUpdater extends WireData implements Module, ConfigurableModule{
             $nodeinfo->firmware = $data['firmware'];
             $nodeinfo->ipv6 = $data['ip'];
             $nodeinfo->online = $data['online'];
-            if ($nodeinfo->isChanged('latitude') ||
-                $nodeinfo->isChanged('longitude')){
-                $nodeinfo->address = $this->get_address($node->latitude, $node->longitude);
+            if ($node->isChanged('lat') ||
+                $node->isChanged('long')){
+                $nodeinfo->address = $this->get_address($nodeinfo->latitude, $nodeinfo->longitude);
               }
           } else {
-            $nodeinfo->online = false;
+            $nodeinfo->online = 0;
           }
           if($node->isChanged()){
             // Save only if the Page has Changes

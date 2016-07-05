@@ -115,7 +115,7 @@ class FieldtypeNodeInfo extends Fieldtype {
 
 		// if given somthing other than an NodeInfo, throw an Error
 		if(!$value instanceof NodeInfo) {
-			throw new WireException("Value set to field '$fied->name' must be an NodeInfo");
+			throw new WireException("Value set to field '$field->name' must be an NodeInfo");
 		}
 
 		// note that sanitization of individual fields within a given event is already

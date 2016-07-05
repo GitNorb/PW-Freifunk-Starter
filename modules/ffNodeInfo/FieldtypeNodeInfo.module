@@ -94,7 +94,7 @@ class FieldtypeNodeInfo extends Fieldtype {
 		// set NodeInfo to an array within sleepValue
 		$sleepValue = array(
 			'ipv6' => $value->ipv6,
-			'lastconnect' => $value->lastconnect,
+			'data' => $value->lastconnect,
 			'hardware' => $value->hardware,
 			'firmware' => $value->firmware,
 			'lat' => $value->lat,
@@ -160,6 +160,8 @@ class FieldtypeNodeInfo extends Fieldtype {
 		// searchable but the others could easily be addad, likely
 		// as fulltext indexes
 
+		//if($field->id) $this->updateDatabaseSchema($field, $schema);
+
 		return $schema;
 	}
 
@@ -170,7 +172,7 @@ class FieldtypeNodeInfo extends Fieldtype {
 	public function getMatchQuery($query, $table, $subfield, $operator, $value){
 
 		// If searching 'lastconnect' then assume our default (data) field
-		if($subfield == 'lastconnect') $subfield = 'data';
+		if(!$subfield || $subfield == 'lastconnect') $subfield = 'data';
 
 		// if value is a formatted date, convert it to unix timestamp
 		if(!ctype_digit("$value")) $value = strtotime($value);
