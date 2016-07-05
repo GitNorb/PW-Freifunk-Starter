@@ -38,7 +38,7 @@
   <li class='accordion-navigation'>
     <a href='#nightly'>Beta</a>
     <div id='nightly' class='content'>
-      <h4>Factory</h4>
+      <h4><span data-tooltip aria-haspopup='true' class='has-tip' title='Möchtest du deinen Router zum Freifunk-Router umfunktionieren bist du hier richtig.'>Factory</span></h4>
       <table class='firmware-download-list'>
         <thead>
           <tr>
@@ -53,7 +53,7 @@
           <?=$betaFactory?>
         </tbody>
       </table><!-- table fectory -->
-      <h4>Sysupgrade</h4>
+      <h4><span data-tooltip aria-haspopup='true' class='has-tip' title='Möchtest du deinen Freifunk-Router Aktualisieren dann ist Sysupgread die richtige Wahl.'>Sysupgrade</span></h4>
       <table class='firmware-download-list'>
         <thead>
           <tr>
