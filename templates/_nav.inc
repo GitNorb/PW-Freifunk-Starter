@@ -68,7 +68,8 @@ function isActive(Page $page, Page $nav){
                 <a href="<?=$pages->get(1)->httpUrl?>processwire"><i class='fa fa-cogs'></i> Admin</a>
               </li>
             <?php }
-            if(wire('user')->hasPermission('page-edit', $page)) { ?>
+            //if($page->createdUser->id == wire('user')->id) {
+            if($page->editable()) {?>
               <li>
                 <a href="<?=$pages->get(1)->httpUrl?>processwire/page/edit/?id=<?=$page->id?>"><i class='fa fa-pencil'></i> Edit Page</a>
               </li>
