@@ -1,13 +1,13 @@
 <?php
 
-class ffNodeInfo extends WireData implements Module, ConfigurableModule{
+class NodeInfoUpdater extends WireData implements Module, ConfigurableModule{
     protected $cache = false;
     protected $cache_node = array();
     protected $src, $nodes;
 
     public static function getModuleInfo() {
         return array(
-            'title' => __('FF Node Info'),
+            'title' => __('Node Info Updater'),
             'version' => '005',
             'author' => 'Kreativmonkey',
             'summary' => __('Save node information for Freifunk'),
@@ -44,30 +44,36 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
     public function set_nodeinfo(HookEvent $e){
         $this->cache_data();
         $nodes = wire('pages')->find("template=node, key!=''");
+
+        // loop throw all nodes
         foreach($nodes as $node){
+
+          // get a data array with the information of the Node
           $data = $this->get_nodeinfo($node->title);
 
           $node->of(false);
           if(!empty($data)){
+            $nodeinfo = $node->nodeinfo;
+
             // Override exist name only if a new one.
             if($data['name'] == 'unbekannt' && empty($node->subtitle)){
               $node->subtitle = $data['name'];
             } elseif($data['name'] != 'unbekannt') {
               $node->subtitle = $data['name'];
             }
-            $node->latitude = str_replace(',', '.', $data['geo']['latitude']);
-            $node->longitude = str_replace(',', '.', $data['geo']['longitude']);
-            $node->lastseen = strtotime($data['lastseen']);
-            $node->node_hardware = $data['hardware'];
-            $node->node_firmware = $data['firmware'];
-            $node->ipv6 = $data['ip'];
-            $node->online = $data['online'];
-            if ($node->isChanged('latitude') ||
-                $node->isChanged('longitude')){
-                $node->address = $this->get_address($node->latitude, $node->longitude);
+            $nodeinfo->lat = str_replace(',', '.', $data['geo']['latitude']);
+            $nodeinfo->long = str_replace(',', '.', $data['geo']['longitude']);
+            $nodeinfo->lastconnect = strtotime($data['lastseen']);
+            $nodeinfo->hardware = $data['hardware'];
+            $nodeinfo->firmware = $data['firmware'];
+            $nodeinfo->ipv6 = $data['ip'];
+            $nodeinfo->online = $data['online'];
+            if ($nodeinfo->isChanged('latitude') ||
+                $nodeinfo->isChanged('longitude')){
+                $nodeinfo->address = $this->get_address($node->latitude, $node->longitude);
               }
           } else {
-            $node->online = false;
+            $nodeinfo->online = false;
           }
           if($node->isChanged()){
             // Save only if the Page has Changes

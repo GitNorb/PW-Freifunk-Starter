@@ -28,24 +28,24 @@ class InputfieldNodeInfo extends Inputfield {
   public function ___render() {
 
 		$name = $this->attr('name');
-
+	
 		$out = "
 			<div class='nodeinfo'>
 				<h2>Node Information</h2>
 				<h4>Last Connection</h4>
-
+				{$name}_lastconnect[]
 				<h4>IPv6</h4>
-
+				{$name}_ipv6[]
 				<h4>Hardware</h4>
-
+				{$name}_hardware[]
 				<h4>Firmware</h4>
-
+				{$name}_firmware[]
 				<h4>Latitude / Longitude</h4>
-
+				{$name}_lat[] , {$name}_long[]
 				<h4>Address</h4>
-
+				{$name}_address[]
 				<h4>Online Status</h4>
-				
+				{$name}_online[]
 			</div>";
   }
 
