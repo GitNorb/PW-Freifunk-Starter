@@ -1,16 +1,15 @@
 <?php
 
-class mailNotification extends WireData implements Module, ConfigurableModule
-{
-    protected $mailAddress, $mailBody, $notificationSave, $notificationDelete, $notificationChange, $notificationTemplates;
+class mailNotification extends WireData implements Module, ConfigurableModule {
+
+    protected $mailAddress, $notificationPublish, $notificationDelete, $notificationChange;
 
     public static function getModuleInfo() {
         return array(
             'title' => __('Mail Notification'),
-            'version' => '001',
+            'version' => '002',
             'author' => 'Kreativmonkey',
             'summary' => __('Notification mail by saving or deleting Pages'),
-            'singular' => true,
             'autoload' => true
         );
     }
@@ -19,171 +18,191 @@ class mailNotification extends WireData implements Module, ConfigurableModule
 
     }
 
+    public function setDefault() {
+      $this->mailAddress = '';
+      $this->notificationPublish = array();
+      $this->notificationDelete = array();
+      $this->notificationChange = array();
+    }
+
     public function init() {
-        if (isset ($this->data ['mailAddress'])) {
 
-        }
+        $this->setDefault();
 
-        if (isset ($this->data ['notificationSave'])){
-          foreach ($this->data ['notificationSave'] as $x) {
+        if (isset($this->data['notificationPublish'])){
+          $this->notificationPublish = $this->data['notificationPublish'];
+          /*
+          foreach ($this->data ['notificationPublish'] as $x) {
             $template = $this->templates->get($x);
             $this->notificationSave->add($template);
-          }
+          }*/
         }
 
-        if (isset ($this->data ['notificatioDelete'])){
-          foreach ($this->data ['notificatioDelete'] as $x) {
-            $template = $this->templates->get($x);
-            $this->notificatioDelete->add($template);
-          }
+        if (isset($this->data['notificatioDelete'])){
+          $this->notificationPublish = $this->data['notificationPublish'];
         }
 
-        if (isset ($this->data ['notificationChange'])){
-          foreach ($this->data ['notificationChange'] as $x) {
-            $template = $this->templates->get($x);
-            $this->notificationChange->add($template);
-          }
+        if (isset($this->data['notificationChange'])){
+          $this->notificationPublish = $this->data['notificationPublish'];
+        }
+
+        if (isset($this->data['mailAddress'])){
+          $this->mailAddress = $this->data['mailAddress'];
         }
 
         $this->addHook('Pages::saved', $this, "hookPageSave");
-        #$this->addHook('Pages::saveModuleConfigData', $this, 'hookPageDelete');
+        $this->addHook('Pages::trashed', $this, "hookPageDelete");
+        //$this->addHook('Pages::saveReady', $this, "hookPageChange");
+        //$this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
     }
 
     public function hookPageSave(HookEvent $event){
       $page = $event->arguments[0];
+      $template = $page->template;
+      $templates = $this->notificationPublish;
 
-      // Sample condition and changes
-      // if this isn't a post, don't continue
-      if($page->template != 'node' || !$page->id) return;
+      // if page have no id => return
+      if(!$page->id) return;
 
-      // if this post wasn't made by an "author" don't continue
-      if(!$page->createdUser->hasRole('author')) return;
+      // Return if template has no notification
+      if(!in_array($template->name, $templates)) return;
+      $this->log->save('debug', "New or Changed Page: {$page->title} with template {$template->name}");
 
-      $subject = '';
-      $message = '';
+      // if this post wasn't made by an "user" don't continue
+      if($page->createdUser->hasRole('admin|manager')) return;
 
-      if($page->isChanged('publish_status') || $page->isChanged('editor_notes')) {
-        // the publish status or editor notes have changed
-        $subject = "[FFMYK] Artikelstatus wurde geändert";
-        $notes = $page->isChanged('editor_notes') ? "Notes: $page->editor_notes" : "";
-        $message = "
-          Title: $page->title\n
-          URL: $page->httpUrl\n
-          Status: {$page->publish_status->title}\n
-          $notes
-          ";
+      $subject = sprintf(__('Add new %s with title %s'), $template->name, $page->get('headline|title'));
+      $message = sprintf(__("New %s from User %s \n========================= \n\nYou can show the new %s under:\n%s"), $template->name, $page->createdUser->get('name|title'), $template->name, $page->httpUrl);
 
-      } else if($page->isChanged('status') && !$page->is(Page::statusUnpublished)) {
-        // page was just published
-        $subject = "[FFMYK] Artikel wurde veröfentlicht";
-        $message = "Der Artikel $page->httpUrl wurde soeben veröfentlicht!";
+      $this->sendMail($subject, $message);
+    }
+
+
+    public function hookPageDelete(HookEvent $event){
+      $page = $event->arguments[0];
+      $template = $page->template;
+      $templates = $this->notificationDelete;
+
+      $this->log->save('debug', "Delete Page: {$page->title} with template {$template->name}");
+      // Return if page has no id
+      if(!$page->id) return;
+
+      // Return if template has no notification
+      if(!in_array($template->name, $template)) return;
+
+      // if this post wasn't made by an "user" don't continue
+      if($page->createdUser->hasRole('admin|manager')) return;
+
+      $subject = sprintf(__('%s has deleted by %s'), $page->get('headline|title'), $page->createdUser->get('name|title'));
+      $message = sprintf(__("%s deleted by %s \n
+                             ========================= \n
+                             \n
+                             You can find it in the bin and restore it."), $page->get('headline|title'), $page->createdUser->get('name|title'));
+
+      $this->sendMail($subject, $message);
+
+
+    }
+
+    public function hookPageChange(HookEvent $event){
+      $page = $event->arguments[0];
+      $template = $page->template;
+      $templates = $this->notificationDelete;
+
+      if(!$page->isChanged()) return;
+
+      $this->log->save('debug', "Changed Page: {$page->title}");
+
+      // Return if page has no id
+      if(!$page->id) return;
+
+      // Return if $template have no notification
+      $templates = $notificationChange;
+      // Return if template has no notification
+      if(!in_array($template->name, $template)) return;
+
+      // if this post wasn't made by an "user" don't continue
+      if($page->createdUser->hasRole('admin|manager')) return;
+
+      $subject = sprintf(__('%s has changed by %s'), $page->get('headline|title'), $page->createdUser->get('name|title'));
+      $message = sprintf(__("%s has changed by %s \n========================= \n\nYou can look for the changes at:\n %s"), $page->get('headline|title'), $page->createdUser->get('name|title'), $page->httpUrl);
+
+      $this->sendMail($subject, $message);
+    }
+
+
+    public function sendMail($subject, $message){
+      // Do nothing if mailaddress is not set!
+      if(empty($this->mailAddress)){
+        $this->log->error(__("Can't send Notification, no mail address was set!"));
+        return;
       }
 
-      if($message) {
-        $reviewer = wire('users')->get('kreativmonkey');
-        //$reviewer2 = wire('users')->get('a');
-        $author = $page->createdUser;
-        $headers = 'From: info@mta-r.de' . "\r\n" .
-                   'Reply-To: kontakt@mta-r.de' . "\r\n" .
-                   'X-Mailer: PHP/' . phpversion();
-        mail("$reviewer->email, $author->email", $subject, $message, $headers);
-        $this->message("E-Mail versendet: $subject");
-      }
-    }
-    public function hookPageDelete(){
+      $mail = wireMail();
+      $mail->to("{$this->mailAddress}")->from('notify@freifunk-myk.de');
+      $mail->subject("$subject");
+      $mail->body("$message");
+      $mail->send();
 
-    }
-    public function hookPageChange(){
-
-    }
-    public function sendMail($message){
-
+      $this->log->message(sprintf(__("Send Mail: %s to %s"), $subject, $this->mailAddress));
     }
 
-    public function hookModuleSave(HookEvent $event) {
-       $className = $event->arguments [0];
-       if ($className != get_class($this)) return;
-       $this->validateConfiguration();
-     }
+    /*public function hookModuleSave(){
+
+    }*/
 
     static public function getModuleConfigInputfields(array $data) {
-        $inputfields = new InputfieldWrapper ();
+      $modules = wire('modules');
+      $tmpTemplates = wire('templates');
+  		foreach($tmpTemplates as $template) {
+        // exclude system fields
+  			if($template->flags & Template::flagSystem) continue;
+  			$templates[] = $template;
+      }
 
-        $mailAddressField = wire('modules')->get('InputfieldText');
-        $mailAddressField->name = 'mailAddress';
-        $mailAddressField->columnWidth = 80;
-        $mailAddressField->label = __('Mail Addresses');
-        $mailAddressField->required = 1;
-        if (isset ($data ['mailAddress']))
-            $mailAddressField->value = $data ['mailAddress'];
-        $mailAddressField->description = __('Mailaddresses like mail@domain.tdl or a username ore user groupe. You can choose more than one address by comma separet.');
-        $inputfields->add($mailAddressField);
+      $inputfields = new InputfieldWrapper();
 
-        $useSSLField = wire('modules')->get('InputfieldCheckbox');
-        $useSSLField->name = 'useSSL';
-        $useSSLField->columnWidth = 20;
-        $useSSLField->label = __('Use SSL?');
-        $useSSLField->description = __('Connects to the LDAP Server via SSL.');
-        if (isset ($data ['useSSL']) && $data ['useSSL'] == 1)
-            $useSSLField->checked = 1;
-        $inputfields->add($useSSLField);
+      $mailAddressField = wire('modules')->get('InputfieldText');
+      $mailAddressField->name = 'mailAddress';
+      $mailAddressField->columnWidth = 80;
+      $mailAddressField->label = __('Mail Addresses');
+      $mailAddressField->required = 1;
+      if (isset($data['mailAddress']))
+        $mailAddressField->value = $data['mailAddress'];
+      $mailAddressField->description = __('Mailaddresses like mail@domain.tdl or a username ore user groupe. You can choose more than one address by comma separet.');
+      $inputfields->add($mailAddressField);
 
-        $useV3Field = wire('modules')->get('InputfieldCheckbox');
-        $useV3Field->name = 'useV3';
-        $useV3Field->columnWidth = 20;
-        $useV3Field->label = __('Use Protocol V3?');
-        $useV3Field->description = __('Use LDAP Protocol V3.');
-        if (isset ($data ['useV3']) && $data ['useV3'] == 1)
-            $useV3Field->checked = 1;
-        $inputfields->add($useV3Field);
+      // Included fields
+  		$field = $modules->get("InputfieldAsmSelect");
+  		$field->name = "notificationPublish";
+  		$field->label = __("Notification by Publish");
+  		$field->description = __("Choose the templates which should be notifyication by publishing.");
+  		foreach($templates as $template) $field->addOption($template->name);
+      if (isset($data['notificationPublish']))
+  		  $field->value = $data['notificationPublish'];
+  		//$field->notes = __('Be careful with this field. If you remove an entry all of it\'s "seo_*" fields get deleted (including the data).');
+      $inputfields->add($field);
 
-        $defaultLoginDomainField = wire('modules')->get('InputfieldText');
-        $defaultLoginDomainField->name = 'loginDomain';
-        $defaultLoginDomainField->label = __('Default Login Domain');
-        $defaultLoginDomainField->required = 1;
-        if (isset ($data ['loginDomain']))
-            $defaultLoginDomainField->value = $data ['loginDomain'];
-        $defaultLoginDomainField->description = __('This is the domain name used by default if the user does not supply a domain name. It will be added to the username, e.g. username@domainname.com');
-        $inputfields->add($defaultLoginDomainField);
+      // Included fields
+  		$field = $modules->get("InputfieldAsmSelect");
+  		$field->name = "notificationChange";
+  		$field->label = __("Notificaltion by Changes");
+  		$field->description = __("Choose the templates which should get notification by changes.");
+  		foreach($templates as $template) $field->addOption($template->name);
+      if (isset($data['notificationChange']))
+    		$field->value = $data['notificationChange'];
+      $inputfields->add($field);
 
-        $adminLoginField = wire('modules')->get('InputfieldText');
-        $adminLoginField->name = 'admin';
-        $adminLoginField->columnWidth = 50;
-        $adminLoginField->label = __('LDAP Admin');
-        $adminLoginField->required = 1;
-        if (isset ($data ['admin']))
-            $adminLoginField->value = $data ['admin'];
-        $adminLoginField->description = __('An LDAP account with access to add/edit/delet users.');
-        $inputfields->add($adminLoginField);
+      // Included fields
+  		$field = $modules->get("InputfieldAsmSelect");
+  		$field->name = "notificationDelete";
+  		$field->label = __("Notification by Delete");
+  		$field->description = __("Choose the templates which should get notification by deleting.");
+  		foreach($templates as $template) $field->addOption($template->name);
+      if (isset($data['notificationDelete']))
+  		  $field->value = $data['notificationDelete'];
+      $inputfields->add($field);
 
-        $secretField = wire('modules')->get('InputfieldText');
-        $secretField->attr ('type','password');
-        $secretField->name = 'secret';
-        $secretField->columnWidth = 50;
-        $secretField->label = __('LDAP Admin Secret');
-        $secretField->description = __('Needet to use with LDAP Admin to add/edit/delete users.');
-        if (isset ($data ['secret']))
-            $secretField->value = $data ['secret'];
-        $inputfields->add($secretField);
-
-        $notificationSaveField = wire('modules')->get('InputfieldPageListSelectMultiple');
-        $notificationSaveField->name = 'notificationSave';
-        $notificationSaveField->label = __('Notification Save');
-        $notificationSaveField->description = __('All templates you would like to get notification by saving pages.');
-        $notificationSaveField->parent_id = wire('templates');
-        if (isset ($data ['notificationSave']))
-            $notificationSaveField->value = $data ['notificationSave'];
-        $inputfields->add($notificationSaveField);
-
-        $debugField = wire('modules')->get('InputfieldCheckbox');
-        $debugField->name = 'debug';
-        $debugField->collapsed = Inputfield::collapsedYes;
-        $debugField->label = __('Debug Mode');
-        $debugField->description = __('Turns on the debug mode so you can see the output of PHP\'s ldap module in the apache log.');
-        if (isset ($data ['debug']) && $data ['debug'] == 1)
-            $debugField->checked = 1;
-        $inputfields->add($debugField);
-
-        return $inputfields;
+      return $inputfields;
     }
 }
