@@ -4,6 +4,8 @@
     Füge den Node zu deinem Profil hinzu damit er sich mit unseren Servern verbinden kann.
     Nach ca. 5 Minuten erscheint dein Node mit allen Informationen in der <a href="<?=$page->httpUrl?>list/">Node Liste</a>.
   </p>
+    <p>Wenn du deine Nodes aus vom Alten Noderegister übernehmen möchtest rufe bitte folgende Seite auf: <a href="<?=$pages->get('/node/')->httpUrl?>import">https://www.ffmyk.de/node/import</a></p>
+
   <form class='omb_nodeAdd' data-abide action='./add' accept-charset='UTF-8' autocomplete='off' method='post'>
       <div class='row collapse'>
         <div class='small-6 columns'>

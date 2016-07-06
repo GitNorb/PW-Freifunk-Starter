@@ -7,7 +7,7 @@
             <span class='prefix'><i class='fa fa-user'></i> *</span>
           </div>
           <div class='small-11 columns'>
-            <input type='text' class='form-control' required pattern='[a-z0-9-_.]+' name='username' placeholder='Benutzername (auch Login)'>
+            <input type='text' class='form-control' required pattern='[a-z0-9-_.]+' name='username' placeholder='Benutzername (auch Login)' <?php if($session->get('username')) echo "value='{$session->get('username')}'"; ?> >
             <small class='error'>Benutzername ist ein Pflichtfeld und darf aus a-z 0-9 sowie -_. bestehen.</small>
           </div>
         </div>
@@ -17,11 +17,11 @@
             <span class='prefix'><i class='fa fa-user'></i> *</span>
           </div>
           <div class='small-12 medium-5 columns'>
-            <input type='text' class='form-control' name='firstname' required placeholder='Vorname'>
+            <input type='text' class='form-control' name='firstname' required placeholder='Vorname' <?php if($session->get('firstname')) echo "value='{$session->get('firstname')}'"; ?>>
             <small class='error'>Der Vorname ist ein Pflichtfeld.</small>
           </div>
           <div class='small-12 medium-6 columns'>
-            <input type='text' class='form-control' name='lastname' required placeholder='Nachname'>
+            <input type='text' class='form-control' name='lastname' required placeholder='Nachname' <?php if($session->get('lastname')) echo "value='{$session->get('lastname')}'"; ?>>
             <small class='error'>Der Nachname ist ein Pflichtfeld.</small>
           </div>
         </div>
@@ -31,7 +31,7 @@
             <span class='prefix'><i class='fa fa-envelope'></i> *</span>
           </div>
           <div class='small-11 columns'>
-            <input type='text' class='form-control' name='email' required placeholder='Email'>
+            <input type='text' class='form-control' name='email' required placeholder='Email' <?php if($session->get('email')) echo "value='{$session->get('email')}'"; ?>>
             <small class='error'>Die E-Mail Adresse ist ein Pflichtfeld.</small>
           </div>
         </div>

@@ -50,34 +50,65 @@ function getTag(PageArray $tags, $limit = 0){
   return $list;
 }
 
-#########################################################
-# setter
-#########################################################
-function setNodeInfo(){
-  $file = file_get_contents('http://ffmyk.niyawe.de/status/data/nodelist.json');
-
-  $data = json_decode($file, true);
-
-  foreach($data['nodes'] as $node){
-    $title = preg_replace('/(.{2})(.{2})(.{2})(.{2})(.{2})(.{2})/', "$1-$2-$3-$4-$5-$6", $node['id']);
-    $p = wire('pages')->get("template=node, title|name=$title");
-
-    if($p instanceof NullPage) continue;
-
-    $p->of(false);
-    $p->subtitle = $node['name'];
-    $p->latitude = $node['position']['lat'];
-    $p->longitude = $node['position']['long'];
-    $p->online = $node['status']['online'];
-    $p->lastconnection = strtotime($node['status']['lastcontact']);
-    $p->save();
-    $p->of(true);
-  }
-}
-
 ###################################################
 # Render
 ####################################################
+function renderPage($template = "") {
+  if(empty($template)) $template = wire('page')->template;
+  $config = wire('config');
+
+  //Create delegate template
+  $template = new TemplateFile($config->paths->templates . "markup/$template.inc");
+
+  //Get the output and save it on $out.
+  return $template->render();
+}
+
+/* Alternative zur obigen Lösung:
+function renderPage($posts = "", $small = false){
+  if(!$posts instanceof PageArray){
+    if($posts instanceof Page){
+      $post = $posts;
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(empty($posts)){
+      $post = wire('page');
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(is_string($posts)){
+      // selector string
+      $selector = $posts;
+      $posts = wire('pages')->find("$selector");
+    }
+  }
+
+  $out = '';
+  foreach ($posts as $p) {
+    switch($p->template){
+      case 'post':
+        $out .= renderPost($p, $small);
+        break;
+      case 'node':
+        $out .= renderEvent($p, $small);
+        break;
+      case 'router':
+        $out .= renderRouter($p, $small);
+        break;
+      case 'profile':
+        $out .= renderProfile($p, $small);
+        break;
+    }
+  }
+
+  if($posts->getLimit() < $posts->getTotal()) $out .= $posts->renderPager(array(
+    'nextItemLabel' => "Ältere Artikel",
+    'previousItemLabel' => "Neure Artikel",
+  ));
+
+  return $out;
+}
+*/
+
 function renderCopyrights(Page $page) {
 
     if (!$page->summary) return '';
@@ -113,59 +144,29 @@ function renderTimeline($timeline){
 
   // Count for the while Schleife
   $count = 0;
-  $output = '';
+  $timeline_blocks = '';
+  $config = wire('config');
 
   foreach($timeline as $post){
-    $title = $post->date;
-    $subheading = $post->title;
-    $summary = $post->summary;
     $image = $post->images->first();
-    $readmore = $post->httpUrl;
-    $leftright = ($count % 2 != 0 ? "" : "class='timeline-inverted'");
+    $t = new TemplateFile($config->paths->templates . "markup/timeline_block.inc");
+    $t->set('title', $post->date);
+    $t->set('subtitle', $post->title);
+    $t->set('summary', $post->summary);
+    $t->set('image', $post->images->first()->size(156,156)->url);
+    $t->set('image_description', $image->description);
+    $t->set('readmore', $post->httpUrl);
+    $t->set('leftright', ($count % 2 != 0 ? "" : "class='timeline-inverted'"));
 
-    $output .= "<li $leftright>
-                  <div class='timeline-image'>
-                    <img class='img-circle img-responsive' src='{$image->size(156,156)->url}' alt='{$image->description}'>
-                  </div>
-                  <div class='timeline-panel'>
-                    <div class='timeline-heading'>
-                      <h4>$title</h4>
-                      <h4 class='subheading'>$subheading</h4>
-                    </div>
-                    <div class='timeline-body'>
-                      <p class='text-muted'>
-                        $summary <a href='{$readmore}'>Weiterlesen</a>
-                      </p>
-                    </div>
-                  </div>
-                </li>";
+    $timeline_blocks .= $t->render();
 
-      $count++;
+    $count++;
   }
 
-  return  "<section id='timeline' data-magellan-destination='timeline' class='info container'>
-                <div class='row'>
-                  <div class='columns large-12 text-center'>
-                    <h2 class='section-heading'>Timeline</h2>
-                    <h3 class='subheader'><small>Unser Weg zum freien Netz.</small></h3>
-                  </div>
-                </div>
-                <div class='row'>
-                  <div class='large-12 columns'>
-                    <ul class='timeline'>
-                      $output
-                      <li class='timeline-inverted'>
-                        <div class='timeline-image'>
-                          <h4>Werde
-                            <br>Teil unserer
-                            <br>Community!</h4>
-                          </div>
-                        </li>
-                      </ul><!-- #timelines -->
-                    </div>
-                  </div>
-                </div>
-              </section><!-- #timeline -->";
+  $t = new TemplateFile($config->paths->templates . "markup/timeline.inc");
+  $t->set('timeline_blocks', $timeline_blocks);
+
+  return $t->render();
 
 }
 
@@ -209,17 +210,6 @@ function renderOnPageBlocks() {
     }
 
     return $out;
-}
-
-function renderPage($template = "") {
-  if(empty($template)) $template = wire('page')->template;
-  $config = wire('config');
-
-  //Create delegate template
-  $template = new TemplateFile($config->paths->templates . "markup/$template.inc");
-
-  //Get the output and save it on $out.
-  return $template->render();
 }
 
 /* Rendern der Infoblocks von Router */
@@ -293,6 +283,15 @@ function renderPageName($title){
 	return $string;
 }
 
+function renderNewNodesList(){
+  $nodes = wire('pages')->find("template=node, sort=-created, limit=10");
+  $list = "";
+  foreach($nodes as $node){
+    $list .= "<li>{$node->get('subtitle|title')}<br/><span class='node-address'>{$node->address}</span></li>";
+  }
+  $output = "<h4>Neuste Nodes</h4><ul class='node-list'>$list</ul>";
+  return $output;
+}
 
 ##########################################################
 # Sonstiges
@@ -311,35 +310,164 @@ function listPages(PageArray $pages){
  *
  * @param  string $template     the template for the new page
  * @param  Page/string $parent  parent Page can be a Page or string
- * @param  string $page         Title of the new Page
+ * @param  string $title        Title of the new Page
  * @return PageArray            The new Page
  */
-function createPage($template, $parent, $page){
+function createPage($template, $parent, $title){
 	if(!$parent instanceof Page) $parent = wire('pages')->get("/$parent/"); // Wenn keine Seite übergeben wird suche eine raus.
 
-	$pageName = renderPageName($page);
+	$pageName = renderPageName($title);
 
 	$t = new Page();
 	$t->template = $template;
 	$t->parent = $parent;
 	$t->name = $pageName;
-	$t->title = $page;
+	$t->title = $title;
 	$t->save();
 
 	return $t;
 }
+
+/**
+ * Fucntion to handle Node registration
+ *
+ * @param string $mac     the MAC Address from the Node
+ * @param string $key     the Node PublicKey for the VPN connection_status
+ * @return string         the Output String to Display the Information of register Node
+ */
+function registerNode($mac, $key){
+  if(empty($mac) || empty($key)) return false;
+
+  $page = wire('page');
+  $node = wire('pages')->get("template=node, title=$mac");
+  $parent = wire('pages')->get($page->id);
+  $operator = wire('user')->id;
+
+  // If node exist?
+  if($node instanceof Nullpage){
+    $titlemac = strtoupper($mac);
+    $n = createPage('node', $parent, $titlemac);
+    $title = "Hinzugefügt";
+    // Owner is not current User
+  } elseif($node->operator->id != $operator) {
+    $content = "<li>Der Node mit der MAC Adresse: $mac ist bereits registriert.</li>";
+    return $content;
+    // Node Aktualisieren
+  } else {
+    $n = $node;
+    $title = "Aktualisiert";
+  }
+
+  $n->key = $key;
+  $n->operator = $operator;
+  $n->of(false);
+  $n->save();
+  $n->of(true);
+
+  $content = "<li>$title: $mac</li>";
+
+  wire('session')->remove('key');
+  wire('session')->remove('mac');
+
+  return $content;
+}
+
+function registerUser($u){
+  // inizialisation ldapHelper Module for Ldap Registration
+  $ldapHelper = wire('modules')->get("ldapHelper");
+
+  if(!wire('users')->get($u["username"]) instanceof NullPage) return "<div data-alert class='alert-box alert'>Der Benutzer mit dem Namen {$u["username"]} existiert bereits.</div>";
+  if(!wire('users')->get("email={$u["email"]}") instanceof NullPage) return "<div data-alert class='alert-box alert'>Die E-Mail {$u["email"]} wird bereits verwendet.</div>";
+
+  if(!$ldapHelper->ldapHelperRegistradeUser($u)) return "<div data-alert class='alert-box alert'>Das Anlegen eines LDAP Users hat leider nicht funktioniert. Bitte versuche es zu einem späteren Zeitpunkt noch einmal.</div> ";
+
+  $new_user = new User();
+  $new_user->of(false);
+  $new_user->name = $u["username"];
+  $new_user->email = $u["email"];
+  $new_user->pass = $u["password"];
+  $new_user->addRole("user");
+  $new_user->firstname = $u["firstname"];
+  $new_user->lastname = $u["lastname"];
+  $new_user->admin_theme = "AdminThemeReno";
+  $new_user->authkey = getToken();
+  $new_user->save();
+  $new_user->of(true);
+
+  $aktivierungslink = wire('page')->httpUrl ."?authkey=". $new_user->authkey ."&user=". $new_user->name;
+  $mail = wireMail();
+  $mail->to($u["email"])->from('registration@ffmyk.de');
+  $mail->subject("Account Aktivierung");
+  $mail->body("===== Account Aktivierung ===== \n\n
+  mit dieser E-Mail kannst du deinen soeben eingerichteten Account bei Freifunk-Myk aktivieren.\n
+  $aktivierungslink \n
+  Sollte der Link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
+  if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
+
+  $session = wire('session');
+  $session->remove('username');
+  $session->remove('email');
+  $session->remove('firstname');
+  $session->remove('lastname');
+
+  return "<div data-alert class='alert-box success radius'>Die Registrierung war erfolgreich, du erhälst nun eine E-Mail mit einem Aktivierungslink.</div>";
+}
 #################################################
 # secret
 #################################################
-function autorized($secret){
-  $pages = wire('pages');
-  $secrets = $pages->get("secret=$secret, template=supernode");
-  if($secrets instanceof NullPage) return false;
-  return true;
+function authorize($auth_user, $secret){
+  if($auth_user->authkey === $secret && $auth_user->authsuccess != true){
+    $auth_user->of(false);
+    $auth_user->authsuccess = true;
+    $auth_user->save();
+    $auth_user->of(true);
+
+    $mail = wireMail();
+    $mail->to($auth_user->email)->from('registration@ffmyk.de');
+    $mail->subject("Herzlich Wilkommen");
+    $mail->body("===== Wilkommen bei Freifunk-Myk ===== \n\n
+    Wir freuen uns dich bei Freifunk-Myk begrüßen zu dürfen. Im Folgenden erklären wir dir die Besonderheiten deines Accounts. \n\n
+    === Mehr als nur ein Account === \n
+    Mit deinem Account bei Freifunk-Myk kannst du dich nicht nur auf unserer Webseite, sondern bei vielen weiteren Diensten im Freifunk-Myk einloggen.\n
+    Ob Router registrieren, Wiki editieren oder dich im Jabber zu unterhalten. Alles mit einem Account.\n\n
+    === Jabber ===\n
+    Jabber ist ein föderalisiertes Chatsystem. Es stehten Clients für Computer, Smartphones und andere Geräte bereit.
+    Du besitzt mit der Registrierung auf Freifunk-Myk direkt einen Jabber Account mit der folgenden ID: {$auth_user->name}@ffmyk.de und deinem Passwort.
+    Wenn du dich einloggst findest du in deiner Kontaktliste direkt eine Liste der Administratoren und kannst dich mit ihnen unterhalten.\n\n
+    Das Freifunk-Myk Team wünscht dir viel Spaß und freut sich auf deine Mitarbeit.");
+    if($mail->send()) wire('log')->message("Send Mail: Welcome to {$auth_user->email} ") ;
+
+    return "<div data-alert class='alert-box success radius'>
+    Dein Account ist erfolgreich Aktiviert. Wir senden dir noch eine Wilkommens E-Mail in der du wichtige Informationen zu unseren Diensten und zu deinem Account findest.
+    </div>";
+  } else {
+    return "<div data-alert class='alert-box alert'>
+      Dein Account wurde bereits Aktiviert.
+    </div>";
+  }
 }
 
-#################################################
-# Hooks
-#################################################
+function crypto_rand_secure($min, $max) {
+        $range = $max - $min;
+        if ($range < 0) return $min; // not so random...
+        $log = log($range, 2);
+        $bytes = (int) ($log / 8) + 1; // length in bytes
+        $bits = (int) $log + 1; // length in bits
+        $filter = (int) (1 << $bits) - 1; // set all lower bits to 1
+        do {
+            $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
+            $rnd = $rnd & $filter; // discard irrelevant bits
+        } while ($rnd >= $range);
+        return $min + $rnd;
+}
 
-wire()->addHook('LazyCron::every2Minutes', null, 'setNodeInfo');
+function getToken($length=32){
+    $token = "";
+    $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    $codeAlphabet.= "abcdefghijklmnopqrstuvwxyz";
+    $codeAlphabet.= "0123456789";
+    for($i=0;$i<$length;$i++){
+        $token .= $codeAlphabet[crypto_rand_secure(0,strlen($codeAlphabet))];
+    }
+    return $token;
+}

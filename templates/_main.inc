@@ -15,15 +15,12 @@ if($page->brower_title) $browserTitle = $page->browser_title;
 
 // add our stylesheet
 #$config->styles->add($config->urls->templates . 'stylesheets/app.css');
-$config->styles->add($config->urls->templates.'stylesheets/app.css');
+$config->styles->add($config->urls->templates.'css/app.css');
 #$config->styles->add('https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css');
 #$config->styles->add('https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css');
 
 // add our javascripts
-$config->scripts->prepend($config->urls->templates.'bower_components/modernizr/modernizr.js');
-$config->scripts->add($config->urls->templates.'bower_components/jquery/dist/jquery.min.js');
-$config->scripts->add($config->urls->templates.'bower_components/foundation/js/foundation.min.js');
-$config->scripts->add($config->urls->templates.'js/app.js');
+$config->scripts->add($config->urls->templates.'js/app-dist.js');
 
 /********************************
 * Hendle Login
@@ -62,6 +59,7 @@ if(!wire('user')->isLoggedin()){
       foreach($config->styles as $key => $file) echo "\n\t<link rel='stylesheet' type='text/css' href='$file'>";
     }
   ?>
+  <title><?php echo $page->get('headline|title') . " &middot; " . $homepage->headline; ?></title>
 
   <link rel="icon" type="image/png" href='<?= $config->urls->templates. 'img/favicon.png' ?>'>
   <meta charset="utf-8" />
@@ -69,7 +67,7 @@ if(!wire('user')->isLoggedin()){
 
 </head>
 <body>
-  <header class="fixed contain-to-grid">
+  <header id="header" class="fixed contain-to-grid">
     <?php include_once('_nav.inc'); ?>
   </header><!-- #sticky -->
 
@@ -85,7 +83,7 @@ if(!wire('user')->isLoggedin()){
   </div>
   <?php } ?>
 
-  <section id="container" class="<?php echo $page->template .' id-'. $id; ?>">
+  <main id="container" class="<?php echo $page->template .' id-'. $id; ?>">
     <?php
       if($input->post->user && $input->post->pass) {
         echo "<div class='alert-box warning' data-alert>" . $session->login_error . "<a href='#' class='close'>&times;</a></div>";
@@ -93,22 +91,24 @@ if(!wire('user')->isLoggedin()){
       ?>
     <?php
     // Homepage (Landingpage) wird direkt im container
-    echo ($page->id === 1 ? $content :   '<div id="content" class="row">'.$content.'</div>');
+    echo ($page->id === 1 || $fullwidth == true ? $content :   '<div id="content" class="row">'.$content.'</div>');
     ?>
-  </section>
+  </main>
 
-  <footer class="footer">
+  <footer id="footer" class="footer">
     <div class="row">
       <div class="small-12 medium-4 medium-push-8 columns">
         <ul class="inline-list social">
-          <li><a href="https://twitter.com/freifunkmyk"><i class="fa fa-twitter"></i></a></li>
-          <li><a mailto="info@freifunk-myk.de"><i class="fa fa-envelope"></i></a></li>
-          <li><a href="https://github.com/FreifunkMYK"><i class="fa fa-github"></i></a></li>
+          <li><a href="https://twitter.com/freifunkmyk"><i class="fa fa-2x fa-twitter-square"></i></a></li>
+          <li><a href="https://github.com/FreifunkMYK"><i class="fa fa-2x fa-github-square"></i></a></li>
+          <li><a mailto="info@freifunk-myk.de"><i class="fa fa-2x fa-envelope"></i></a></li>
         </ul>
-        <p class="copywrite">Design by kreativmonkey with foundation</p>
+        <p class="copywrite">&copy; <?=date("Y")?> <?=$homepage->headline?></p>
       </div>
       <div class="small-12 medium-8 medium-pull-4 columns">
-        <a class="ff-logo regular" href="<?=$pages->get("/")->httpUrl?>">Freifunk-Myk</a>
+        <p>
+          <?php //if($user->id == $page->createdUser->id){ echo "true";}?>
+        </p>
         <ul class="inline-list">
           <li><a href="#">Home</a></li>
           <li><a href="#">Blog</a></li>
@@ -116,14 +116,20 @@ if(!wire('user')->isLoggedin()){
           <li><a href="#">Faq</a></li>
           <li><a href="#">Kontakt</a></li>
         </ul>
-        <p class="copywrite">Copywrite not copywrite © <?=date("Y")?></p>
+        <p class="copywrite">Erstellt mit <a href="http://de.processwire.com/">ProcessWire</a> und <a href="http://foundation.zurb.com/">Foundation Zurb</a>. Zu finden auf <a href="https://github.com/FreifunkMYK/PW-Freifunk-Starter">GitHub</a>.
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 medium-2 medium-push-10 columns">
+      </div>
+      <div class="small-12 medium-10 medium-pull-2 columns">
       </div>
     </div>
   </footer>
 
   <?php
 	 #if($modules->isInstalled("AllInOneMinify")){
-      	if(false){
+	 	if(false){
 		foreach($config->scripts as $key => $file) $scriptfiles[] = str_replace($config->urls->templates, "", $file);
       	print_r($scriptfiles);?>
       		<script src="<?php echo AIOM::JS($scriptfiles); ?>"> </script><?php
@@ -132,6 +138,42 @@ if(!wire('user')->isLoggedin()){
       		foreach($config->scripts as $file) echo "\n\t<script src='$file'></script>";
     }
   ?>
+  <script>
+    /*(function() {
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = '<?=$config->urls->templates?>js/app-dist.js';
+      var x = document.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    })();
 
+    function loadCSS(href){
+      var ss = window.document.createElement('link'),
+          ref = window.document.getElementsByTagName('head')[0];
+
+      ss.rel = 'stylesheet';
+      ss.href = href;
+
+      // temporarily, set media to something non-matching to ensure it'll
+      // fetch without blocking render
+      ss.media = 'only x';
+
+      ref.insertBefore(ss, ref.firstChild);
+
+      setTimeout( function(){
+        // set media back to `all` so that the stylesheet applies once it loads
+        ss.media = 'all';
+      },0);
+    }
+    loadCSS('<?php echo $config->urls->templates.'css/app.css'; ?>'); */
+
+  	// Foundation JavaScript
+  	// Documentation can be found at: http://foundation.zurb.com/docs
+  	$(document).foundation();
+  </script>
+  <noscript>
+    <script src="<?=$config->urls->templates?>js/app-dist.js"></script>
+    <link rel="stylesheet" href="<?php echo $config->urls->templates.'css/app.css';?>">
+  </noscript>
 </body>
 </html>

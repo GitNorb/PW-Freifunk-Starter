@@ -8,9 +8,9 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
     public static function getModuleInfo() {
         return array(
             'title' => __('LDAP Helper'),
-            'version' => '004',
+            'version' => '006',
             'author' => 'Kreativmonkey',
-            'summary' => __('Handle LDAP communication for ProcessWire'),
+            'summary' => __('Hendle LDAP Communication for Processwire'),
             'singular' => true,
             'autoload' => true
         );
@@ -18,7 +18,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
     public function ___install() {
         if (!function_exists('ldap_connect'))
-            throw new WireException ('Please ensure php_ldap is loaded.');
+            throw new WireException ('Please make sure that extension php_ldap is loaded.');
     }
 
     public function init() {
@@ -39,11 +39,9 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
         if (isset ($this->data ['loginDomain']))
             $this->defaultLoginDomain = $this->data ['loginDomain'];
-        $this->userDefaultRoles = new WireArray ();
 
         if (isset ($this->data ['admin']))
             $this->admin = $this->data ['admin'];
-        $this->userDefaultRoles = new WireArray ();
 
         if (isset ($this->data ['secret']))
             $this->secret = $this->data ['secret'];
@@ -54,6 +52,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         if (isset ($this->data ['ldapSetting']))
             $this->ldapSetting = $this->data ['ldapSetting'];
 
+        $this->userDefaultRoles = new WireArray ();
         if (isset ($this->data ['userDefaultRoles'])) {
             foreach ($this->data ['userDefaultRoles'] as $x) {
                 $role = $this->roles->get($x);
@@ -66,6 +65,8 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
         $this->pages->addHookBefore("delete", $this, "ldapHelperDeleteUser");
         $this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
+        $this->session->addHookAfter('login', $this, 'ldapHelperLogin');
+        $this->addHookBefore("Password::setPassword", $this, 'ldapHelperChangePw');
     }
 
     public function ldapHelperRegistradeUser(Array $user) {
@@ -109,26 +110,127 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       return true;
     }
 
+    public function ldapHelperLogin(HookEvent $event){
+      if($event->return) return;
+
+      $username = $event->arguments[0];
+      $password = $event->arguments[1];
+
+      if(!$con = $this->ldapHelperConnect()) return; // Connection Failed
+      $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$username))");
+      $user_entry = ldap_first_entry($con, $user_search);
+      $user_dn = ldap_get_dn($con, $user_entry);
+
+      if(@ldap_bind($con, $user_dn, $password)){
+        $wireUserName = $this->sanitizer->pageName($username);
+
+        $user = $this->users->get("name=$wireUserName");
+        if($user instanceof NullPage){
+          // Search the LDAP Entry
+          $first_name = ldap_get_values($con, $user_entry, "cn");
+          $last_name = ldap_get_values($con, $user_entry, "sn");
+
+          // Add ldap user to ProcessWire
+          $new_user = new User();
+          $new_user->of(false);
+          $new_user->name = $wireUserName;
+          $new_user->firstname = $first_name;
+          $new_user->lastname = $last_name;
+          $new_user->pass = $password;
+          $new_user->addRole("user");
+          $new_user->admin_theme = "AdminThemeReno";
+          $new_user->save();
+          $new_user->of(true);
+        } else {
+          // Set new Password
+          $user->of(false);
+          $user->pass = $password;
+          if($user->isChanged('pass')){
+             $user->save();
+             $this->message($this->_('Password changed success.'));
+           }
+           $user->of(true);
+        }
+
+        $user = $this->session->login($wireUserName, $password);
+        $event->return = $user;
+
+        $this->message($this->_('Logged in via LDAP.'));
+
+        return;
+      } else {
+        $this->message("Bitte Registriere dich.");
+      }
+    }
+
+    protected function ldapHelperChangePw(HookEvent $event) {
+        $return = $event->arguments[0];
+
+        $this->message("Password: $return");
+
+        /*$page = $event->arguments[0];
+        $user = wire('user');
+        $users = wire('users');
+
+        $this->message("Page Save");
+        if($page->template != 'user' || !$page->id) return;
+
+
+        foreach($event->arguments[1] as $key => $argument){
+          $this->message("$key: $argument");
+        }
+
+        $this->message("$message");
+
+        if($page->isChanged('pass'))
+          $page->of(false);
+          $this->message("Password Changed to {$page->pass}");
+          $page->of(true); */
+
+        /*if(!$con = $this->ldapHelperConnect()) return;
+
+        $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$user))");
+        $user_get = ldap_get_entries($con, $user_search);
+        $user_entry = ldap_first_entry($con, $user_search);
+        $user_dn = ldap_get_dn($con, $user_entry);
+
+        $entry = array();
+        $entry["userPassword"] = $this->makeSshaPassword($pw_new);
+
+        if(ldap_bind($con, $user_dn, $pw_old) === false){
+            $message = "Error E101 - Current Username or Password is wrong.";
+            return false;
+        }
+        if(ldap_modify($con,$user_dn,$entry) === false){
+            $error = ldap_error($con);
+            $errno = ldap_errno($con);
+            $message = "$errno - $error";
+        }*/
+      }
+
     public function ldapHelperDeleteUser(HookEvent $event) {
         $page = $event->arguments("page");
 
         if (!$page->id && !$page->template->name === "user") return; // Return if User is not deleted
         $username = $page->name;
 
-        // bind with correct DN for write access
+        // bind mit passendem dn für aktualisierenden Zugriff
         $connect = $this->ldapHelperConnect();
         $r= $this->ldapHelperWrite($connect);
 
-        // Delete user from LDAP
-        $dn= "uid=$username,ou=People,dc=ffmyk,dc=de";
-        if(ldap_delete( $connect , $dn )){ // Return true or false
-          $message = ldap_err2str(ldap_errno($connect));
+        $user_search = ldap_search($connect,"dc=ffmyk,dc=de","(|(uid=$user))");
+        $user_entry = ldap_first_entry($connect, $user_search);
+
+        // Delete User from LDAP
+        $dn= ldap_get_dn($connect, $user_entry);
+        if(ldap_delete( $connect , $dn )){
           $this->message("Delete LDAP User: $username");
           $this->log->save('ldap_helper', "Delete User: $username");
         } else {
-          $message = ldap_err2str(ldap_errno($connect));
-          $this->message("Delete LDAP User failed $message");
-          $this->log->save('ldap_helper', printf($this->_("Failed to delete user %s: %s"), $username, $message");
+          $errno = ldap_errno($connect); // Error code
+          $error = ldap_error($connect); // Error text
+          $this->message("Delete LDAP User failed $error ($errno)");
+          $this->log->save('ldap_helper', "Delete User failed $error ($errno)");
         }
 
         ldap_close($connect);
@@ -143,7 +245,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
     protected function ldapHelperConnect() {
       if ($this->debugMode) ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, 7); // LDAP DebugMode
-      if(!$connection = ldap_connect($this->host, $this->port)) return $this->log->save('LDAP', printf(__("Failed to connect LDAP: %s"), ldap_err2str(ldap_errno($connection)))); // Annahme: der LDAP Server befindet sich auf diesem Host
+      if(!$connection = ldap_connect($this->host, $this->port)) return $this->log->save('LDAP', printf(__("Failed to connect LDAP %d pages."), ldap_err2str(ldap_errno($connection)))); // Annahme: der LDAP Server befindet sich auf diesem Host
       if ($this->useV3) ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3); // Set LDAP_PROTOCOL_VERSION
       return $connection;
     }
@@ -186,7 +288,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $useSSLField->name = 'useSSL';
         $useSSLField->columnWidth = 20;
         $useSSLField->label = __('Use SSL?');
-        $useSSLField->description = __('Connects to the LDAP server via SSL.');
+        $useSSLField->description = __('Connects to the LDAP Server via SSL.');
         if (isset ($data ['useSSL']) && $data ['useSSL'] == 1)
             $useSSLField->checked = 1;
         $inputfields->add($useSSLField);
@@ -216,7 +318,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $adminLoginField->required = 1;
         if (isset ($data ['admin']))
             $adminLoginField->value = $data ['admin'];
-        $adminLoginField->description = __('A LDAP account with permission to add/edit/delete users. Example: cn=accountmanager,dc=domain,dc=com');
+        $adminLoginField->description = __('An LDAP account with access to add/edit/delet users. Example: cn=accountmanager,dc=domain,dc=com');
         $inputfields->add($adminLoginField);
 
         $secretField = wire('modules')->get('InputfieldText');
@@ -224,7 +326,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $secretField->name = 'secret';
         $secretField->columnWidth = 50;
         $secretField->label = __('LDAP Admin Secret');
-        $secretField->description = __('Password for the previously named account.');
+        $secretField->description = __('Needet to use with LDAP Admin to add/edit/delete users.');
         if (isset ($data ['secret']))
             $secretField->value = $data ['secret'];
         $inputfields->add($secretField);
@@ -240,7 +342,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
         $userDefaultRolesField = wire('modules')->get('InputfieldPageListSelectMultiple');
         $userDefaultRolesField->name = 'userDefaultRoles';
-        $userDefaultRolesField->label = __('Default roles for new users');
+        $userDefaultRolesField->label = __('Default Roles for new Users');
         $userDefaultRolesField->description = __('These user roles will be applied to all new LDAP users. Please note that the guest role is applied automatically.');
         $userDefaultRolesField->parent_id = wire('roles')->getGuestRole()->parent_id;
         if (isset ($data ['userDefaultRoles']))

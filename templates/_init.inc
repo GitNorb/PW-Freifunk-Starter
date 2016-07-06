@@ -11,18 +11,19 @@ $useMain = true;
  **/
 $headline = $page->get("headline|title");
 $authorID = $page->createdUser;
-$authorName = $page->createdUser->get('title|name');
 $content = (!empty($page->body) ? $page->body : "");
 $date = $page->created;
 $url = $page->httpUrl;
 $today = time();
 $id = $page->id;
 $title = $page->get("headline|title");
+$fullwidth = false;
 
-/**
- * authorURL
- **/
- // set a couple new fields that our output will use
- $page->set('authorURL', wire('config')->urls->root . 'authors/' . $page->createdUser->name . '/');
+//time settings
+setlocale (LC_ALL, 'de_DE.UTF-8');
+
+// set a couple new fields that our output will use
+$page->set('authorURL', wire('config')->urls->root . 'profile/' . $page->createdUser->name . '/');
+$page->set('authorName', wire('page')->createdUser->get('name|title') );
 
 require_once("./_function.inc");
