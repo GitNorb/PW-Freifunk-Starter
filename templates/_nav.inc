@@ -18,7 +18,12 @@ function isActive(Page $page, Page $nav){
 <nav class="top-bar" data-topbar role="navigation">
   <ul class="title-area">
     <li class="name">
-      <h2><a href="<?=$homepage->httpUrl?>">Freifunk-MYK</a></h2>
+      <h2>
+        <a href="<?=$homepage->httpUrl?>">
+          <?php if($homepage->logo){ ?> <img src="<?php echo $homepage->logo->size(35,35)->url ?>"/> <?php } ?>
+          <?=$homepage->headline?>
+        </a>
+      </h2>
     </li>
     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
     <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
@@ -33,14 +38,11 @@ function isActive(Page $page, Page $nav){
       <li <?php echo (isActive($page, $pages->get("/blog/")) ? "class='active'" : ""); ?> >
         <a href="<?=$pages->get("/blog/")->url?>">Blog</a>
       </li>
-      <li><a href="#">Wiki</a></li>
-      <li <?php echo (isActive($page, $pages->get("/router/")) ? "class='active has-dropdown'" : "class='has-dropdown'"); ?>>
+      <li><a href="https://wiki.freifunk-myk.de">Wiki</a></li>
+      <li <?php echo (isActive($page, $pages->get("/router/")) ? "class='active'" : "class=''"); ?>>
         <a href="<?=$pages->get("/router/")->url?>">Router</a>
-        <ul class="dropdown">
-          <li><a href="<?=$pages->get("/router/")->url?>">Firmware</a></li>
-        </ul>
       </li>
-      <li><a href="#">Karte</a></li>
+      <li><a href="https://status.freifunk-myk.de">Karte</a></li>
       <li class="has-dropdown">
         <?php if(!wire('user')->isLoggedin()){ ?>
           <a href="#" data-dropdown="signin">Anmelden</a>
@@ -48,18 +50,26 @@ function isActive(Page $page, Page $nav){
           <a href="#">Benutzer</a>
           <ul class="dropdown">
             <li>
-              <a href="<?= $pages->get(8544)->httpURL ?>"><i class='fa fa-user'></i> Profil</a>
+              <a href="<?= $pages->get('/profile/')->httpURL ?><?= $user->name ?>"><i class='fa fa-user'></i> Profil</a>
             </li>
             <li>
               <a href="<?= $pages->get("/node/")->httpURL ?>"><i class='fa fa-wifi'></i> Nodes</a>
             </li>
             <li>
-              <a href="<?= $pages->get('title|name=lesezeichen')->httpURL ?>"><i class='fa fa-bookmark'></i> Lesezeichen</a>
+              <a href="<?= $pages->get('/static-ip/')->httpURL ?>"><i class='fa fa-server'></i> Statische IPs</a>
             </li>
-            <?php if(wire('user')->hasRole('superuser') || wire('user')->hasRole('manager')){ ?>
+            <?php if(wire('user')->hasPermission('page-create')) { ?>
+              <li>
+                <a href="<?=$pages->get(1)->httpUrl?>processwire/page/add/?parent_id=1025"><i class='fa fa-plus'></i> Neuer Blogpost</a>
+              </li>
+            <?php  } ?>
+            <?php if(wire('user')->hasRole('superuser') || wire('user')->hasRole('admin') || wire('user')->hasRole('manager')){ ?>
               <li>
                 <a href="<?=$pages->get(1)->httpUrl?>processwire"><i class='fa fa-cogs'></i> Admin</a>
               </li>
+            <?php }
+            //if($page->createdUser->id == wire('user')->id) {
+            if($page->editable()) {?>
               <li>
                 <a href="<?=$pages->get(1)->httpUrl?>processwire/page/edit/?id=<?=$page->id?>"><i class='fa fa-pencil'></i> Edit Page</a>
               </li>
@@ -87,7 +97,7 @@ function isActive(Page $page, Page $nav){
       </div>
       <div >
         <button type="submit" id="btnLogin" name='submit' value='Login' class="btn btn-default">Login</button>
-        <a href="<?php $homepage ?>/registration/"><button type="button" id="btnRegister" class="btn btn-default">Registrieren</button></a>
+        <button type="submit" id="btnRegister" formaction="<?php echo $pages->get("/registration/")->httpUrl; ?>" class="btn btn-default">Registrieren</button>
       </div>
     </form>
     <a href="<?=$pages->get("template=password-reset")->url?>">Password vergessen?</a>

@@ -15,7 +15,7 @@ function readCSV($file){
  * Render
  **********************/
 // Render a Page Title
-function renderPageName($title){
+function renderPageTitle($title){
 	$sanitizer = wire('sanitizer');
 	$string = iconv("UTF-8", "ASCII//TRANSLIT", $title);
 	$string = preg_replace ( '/[^a-z0-9-]/', '', $string ); // Entfernen der Sonderzeichen
@@ -68,20 +68,6 @@ function pageField($field, $title){
  * Creators
  ********************/
 // Create Page
-function createPage($template, $parent, $page){
-	if(!$parent instanceof Page) $parent = wire('pages')->get("/$parent/"); // Wenn keine Seite übergeben wird suche eine raus.
-
-	$pageName = renderPageName($page);
-
-	$t = new Page();
-	$t->template = $template;
-	$t->parent = $parent;
-	$t->name = $pageName;
-	$t->title = $page;
-	$t->save();
-
-	return $t;
-}
 
 // Creat User
 function createUser($user){

@@ -21,3 +21,8 @@ config.php
 /templates/.sass-cache/*
 *.DS_Store
 /templates/stylesheets/*
+
+### Sensitive ###
+templates/scripts/node_migration.php
+templates/prepros.cfg
+/.project

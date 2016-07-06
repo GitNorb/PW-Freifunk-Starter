@@ -5,7 +5,11 @@ $content = '';
 // form was submitted so we process the form
 if($input->post->submit) {
 
-        $ldapHelper = $modules->get("ldapHelper");
+        $session->set('username', "{$sanitizer->username($input->post->username)}");
+        $session->set('email', "{$sanitizer->email($input->post->email)}");
+        $session->set('firstname', "{$sanitizer->text($input->post->firstname)}");
+        $session->set('lastname', "{$sanitizer->text($input->post->lastname)}");
+
          //Sanatize and assign variables data before creating user.
         $nuser["username"] = $sanitizer->username($input->post->username);
         $nuser["email"] = $sanitizer->email($input->post->email);
@@ -13,41 +17,23 @@ if($input->post->submit) {
         $nuser["firstname"] = $sanitizer->text($input->post->firstname);
         $nuser["lastname"] = $sanitizer->text($input->post->lastname);
 
-        if(wire('users')->get($nuser["username"]) instanceof NullPage){
-          if($ldapHelper->ldapHelperRegistradeUser($nuser)){
-            $new_user = new User();
-            $new_user->of(false);
-            $new_user->name = $nuser["username"];
-            $new_user->email = $nuser["email"];
-            $new_user->pass = $nuser["password"];
-            $new_user->addRole("user");
-            $new_user->firstname = $nuser["firstname"];
-            $new_user->lastname = $nuser["lastname"];
-            $new_user->admin_theme = "AdminThemeReno";
-            $new_user->language = 1023;
-            $new_user->save();
-            $new_user->of(true);
+        $content .= registerUser($nuser);
 
-            $content .= "<div data-alert class='alert-box success radius'>Die Registrierung war erfolgreich</div>";
-          } else {
-            $content .= "<div data-alert class='alert-box alert'>
-            Das Anlegen eines LDAP Users hat leider nicht funktioniert. Bitte versuche es zu einem späteren Zeitpunkt noch einmal.
-            </div> ";
-          }
-        } else {
-          $content .= "<div data-alert class='alert-box alert'>
-                        Der Benutzername <strong>{$nuser['username']}</strong> ist schon vergeben!
-                      </div>";
-        }
-  }
+} elseif($input->get->authkey) {
+  $auth_user = $users->get($input->get->user);
+  $content .= authorize($auth_user, $input->get->authkey);
+}
 
 
-if(!wire('user')->isLoggedin() && !wire('input')->post->submit){
+if(!wire('user')->isLoggedin() && !wire('input')->post->submit || !wire('user')->isLoggedin() && !wire('input')->get->authkey){
   $content .= renderPage('registration_form');
-} elseif(!wire('input')->post->submit) {
+} elseif(!wire('input')->post->submit || !wire('input')->get->authkey) {
   $content .= "<div data-alert class='alert-box alert'>
     Du bist eingeloggt!
   </div> ";
+
+  //$aktivierungslink = wire('page')->httpUrl ."?authkey=". $user->authkey ."&user=". $user->name;
+  //wireMail("{$user->email}", 'registration@ffmyk.de', 'Activierung', "Aktivierungs Link: \n $aktivierungslink");
 }
 
 $content = "<div id='article' class='row'> $content </div>";

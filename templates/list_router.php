@@ -3,7 +3,7 @@ $routers = $pages->find("template=router, sort=title");
 $output = '';
 #include_once('scripts/import.inc');
 #$today = strtotime('-1 day', $today);
-#$h = $pages->find("created>=$today, template=hersteller");
+#$h = $pages->find("template=hersteller");
 
 #foreach($h as $p){
 #  $pages->delete($p, true);
