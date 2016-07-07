@@ -39,34 +39,60 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
         }
 
         if (isset($this->data['notificatioDelete'])){
-          $this->notificationPublish = $this->data['notificationPublish'];
+          $this->notificationDelete = $this->data['notificationDelete'];
         }
 
         if (isset($this->data['notificationChange'])){
-          $this->notificationPublish = $this->data['notificationPublish'];
+          $this->notificationChange = $this->data['notificationChange'];
         }
 
         if (isset($this->data['mailAddress'])){
           $this->mailAddress = $this->data['mailAddress'];
         }
 
-        $this->addHook('Pages::saved', $this, "hookPageSave");
-        $this->addHook('Pages::trashed', $this, "hookPageDelete");
+        //$this->addHook('Pages::saved', $this, "hookPageSave");
+        $this->addHook('Pages::saveReady', $this, "hookCheckNotification");
+        //$this->addHook('Pages::trashed', $this, "hookPageDelete");
         //$this->addHook('Pages::saveReady', $this, "hookPageChange");
         //$this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
     }
 
-    public function hookPageSave(HookEvent $event){
+    public function hookCheckNotification(HookEvent $event){
       $page = $event->arguments[0];
       $template = $page->template;
-      $templates = $this->notificationPublish;
+      $templates = $this->notificationChange;
 
       // if page have no id => return
-      if(!$page->id) return;
+      if(!$page->id || !$page->title) return;
 
-      // Return if template has no notification
-      if(!in_array($template->name, $templates)) return;
-      $this->log->save('debug', "New or Changed Page: {$page->title} with template {$template->name}");
+
+      // Check if page is Deleted
+      if($page->isTrash()){
+        $this->log->save('debug', "Page is Deleted: $page->title");
+        //$this->hookPageDelete($event);
+        return;
+      }
+
+      if($page->isNew()){
+        if(!in_array($template->name, $this->notificationPublish)) return;
+
+        $this->log->save('debug', "New Page: $page->title");
+        return;
+      }
+
+      // Check if page is Changed
+      if($page->isChanged() && !$page->isNew()){
+        if(!in_array($template->name, $this->notificationChange)) return;
+
+        $this->log->save('debug', "Page Changed: $page->title");
+        //$this->hookPageChange($event);
+        return;
+      }
+
+    }
+
+    public function notificationPublish(WirePage $page){
+      $template = $page->template;
 
       // if this post wasn't made by an "user" don't continue
       if($page->createdUser->hasRole('admin|manager')) return;
@@ -75,6 +101,8 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
       $message = sprintf(__("New %s from User %s \n========================= \n\nYou can show the new %s under:\n%s"), $template->name, $page->createdUser->get('name|title'), $template->name, $page->httpUrl);
 
       $this->sendMail($subject, $message);
+      // Message to User
+      $this->message(sprintf(__("Publish %s and send mail notification for new %s"), $page->title, $page->template->name));
     }
 
 
@@ -100,8 +128,8 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
                              You can find it in the bin and restore it."), $page->get('headline|title'), $page->createdUser->get('name|title'));
 
       $this->sendMail($subject, $message);
-
-
+      // Message to User
+      $this->message(sprintf(__("Delete %s and send mail notification to administrator"), $page->title));
     }
 
     public function hookPageChange(HookEvent $event){
@@ -128,6 +156,8 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
       $message = sprintf(__("%s has changed by %s \n========================= \n\nYou can look for the changes at:\n %s"), $page->get('headline|title'), $page->createdUser->get('name|title'), $page->httpUrl);
 
       $this->sendMail($subject, $message);
+      // Message to User
+      $this->message(sprintf(__("Change %s and send mail notification to admin for changed %s."), $page->title, $page->template->name));
     }
 
 
@@ -138,11 +168,11 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
         return;
       }
 
-      $mail = wireMail();
+      /*$mail = wireMail();
       $mail->to("{$this->mailAddress}")->from('notify@freifunk-myk.de');
       $mail->subject("$subject");
       $mail->body("$message");
-      $mail->send();
+      $mail->send();*/
 
       $this->log->message(sprintf(__("Send Mail: %s to %s"), $subject, $this->mailAddress));
     }
