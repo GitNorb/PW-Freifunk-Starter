@@ -7,7 +7,7 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return array(
             'title' => __('Mail Notification'),
-            'version' => '002',
+            'version' => '003',
             'author' => 'Kreativmonkey',
             'summary' => __('Notification mail by saving or deleting Pages'),
             'autoload' => true
@@ -31,11 +31,6 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
 
         if (isset($this->data['notificationPublish'])){
           $this->notificationPublish = $this->data['notificationPublish'];
-          /*
-          foreach ($this->data ['notificationPublish'] as $x) {
-            $template = $this->templates->get($x);
-            $this->notificationSave->add($template);
-          }*/
         }
 
         if (isset($this->data['notificatioDelete'])){
@@ -50,11 +45,7 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
           $this->mailAddress = $this->data['mailAddress'];
         }
 
-        //$this->addHook('Pages::saved', $this, "hookPageSave");
         $this->addHook('Pages::saveReady', $this, "hookCheckNotification");
-        //$this->addHook('Pages::trashed', $this, "hookPageDelete");
-        //$this->addHook('Pages::saveReady', $this, "hookPageChange");
-        //$this->addHookAfter('Modules::saveModuleConfigData', $this, 'hookModuleSave');
     }
 
     public function hookCheckNotification(HookEvent $event){
@@ -68,34 +59,37 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
 
       // Check if page is Deleted
       if($page->isTrash()){
-        $this->log->save('debug', "Page is Deleted: $page->title");
-        //$this->hookPageDelete($event);
-        return;
-      }
-
-      if($page->isNew()){
-        if(!in_array($template->name, $this->notificationPublish)) return;
-
-        $this->log->save('debug', "New Page: $page->title");
+        $this->notificationDelete($page);
+        $this->log->save('message', "Page deleted: $page->title");
         return;
       }
 
       // Check if page is Changed
-      if($page->isChanged() && !$page->isNew()){
+      if($page->isChanged()){
+        if($page->isChanged("status") && !$page->is(PAGE::statusUnpublished)){
+          if(!in_array($template->name, $this->notificationPublish)) return;
+
+          $this->notificationPublish($page);
+          $this->log->save('message', "Page published: $paget->title");
+          return;
+        }
         if(!in_array($template->name, $this->notificationChange)) return;
 
-        $this->log->save('debug', "Page Changed: $page->title");
-        //$this->hookPageChange($event);
+        $this->notificationChange($page);
+        $this->log->save('message', "Page changed: $paget->title");
         return;
       }
 
     }
 
-    public function notificationPublish(WirePage $page){
+    public function notificationPublish(Page $page){
       $template = $page->template;
 
       // if this post wasn't made by an "user" don't continue
       if($page->createdUser->hasRole('admin|manager')) return;
+
+      // only notify by published pages
+      if($page->is(Page::statusUnpublished)) return;
 
       $subject = sprintf(__('Add new %s with title %s'), $template->name, $page->get('headline|title'));
       $message = sprintf(__("New %s from User %s \n========================= \n\nYou can show the new %s under:\n%s"), $template->name, $page->createdUser->get('name|title'), $template->name, $page->httpUrl);
@@ -106,12 +100,10 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
     }
 
 
-    public function hookPageDelete(HookEvent $event){
-      $page = $event->arguments[0];
+    public function notificationDelete(Page $page){
       $template = $page->template;
       $templates = $this->notificationDelete;
 
-      $this->log->save('debug', "Delete Page: {$page->title} with template {$template->name}");
       // Return if page has no id
       if(!$page->id) return;
 
@@ -122,32 +114,25 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
       if($page->createdUser->hasRole('admin|manager')) return;
 
       $subject = sprintf(__('%s has deleted by %s'), $page->get('headline|title'), $page->createdUser->get('name|title'));
-      $message = sprintf(__("%s deleted by %s \n
-                             ========================= \n
-                             \n
-                             You can find it in the bin and restore it."), $page->get('headline|title'), $page->createdUser->get('name|title'));
+      $message = sprintf(__("%s deleted by %s \n========================= \n\nYou can find it in the bin and restore it."), $page->get('headline|title'), $page->createdUser->get('name|title'));
 
       $this->sendMail($subject, $message);
       // Message to User
       $this->message(sprintf(__("Delete %s and send mail notification to administrator"), $page->title));
     }
 
-    public function hookPageChange(HookEvent $event){
-      $page = $event->arguments[0];
+    public function notificationChange(Page $page){
       $template = $page->template;
       $templates = $this->notificationDelete;
 
+      // Überprüfen ob die Seite geändert wurde
       if(!$page->isChanged()) return;
-
-      $this->log->save('debug', "Changed Page: {$page->title}");
 
       // Return if page has no id
       if(!$page->id) return;
 
-      // Return if $template have no notification
-      $templates = $notificationChange;
       // Return if template has no notification
-      if(!in_array($template->name, $template)) return;
+      if(!in_array($template->name, $this->notificationChange)) return;
 
       // if this post wasn't made by an "user" don't continue
       if($page->createdUser->hasRole('admin|manager')) return;
@@ -168,11 +153,11 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
         return;
       }
 
-      /*$mail = wireMail();
+      $mail = wireMail();
       $mail->to("{$this->mailAddress}")->from('notify@freifunk-myk.de');
       $mail->subject("$subject");
       $mail->body("$message");
-      $mail->send();*/
+      $mail->send();
 
       $this->log->message(sprintf(__("Send Mail: %s to %s"), $subject, $this->mailAddress));
     }
