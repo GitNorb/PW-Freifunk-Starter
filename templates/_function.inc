@@ -287,7 +287,10 @@ function renderNewNodesList(){
   $nodes = wire('pages')->find("template=node, sort=-created, limit=10");
   $list = "";
   foreach($nodes as $node){
-    $list .= "<li>{$node->get('subtitle|title')}<br/><span class='node-address'>{$node->address}</span></li>";
+    $color = ($node->online ? "green" : "red");
+    $alt = ($node->online ? "Online" : "Offline");
+    $list .= "<li><i class='fa fa-wifi' style='color:$color' alt='$alt'></i> <a href='{$node->httpUrl}'>{$node->get('subtitle|title')}</a>";
+    $list .= ($node->address ? "<br/><span class='node-address'><i class='fa fa-fw'></i> {$node->address}</span></li>" : "");
   }
   $output = "<h4>Neuste Nodes</h4><ul class='node-list'>$list</ul>";
   return $output;
