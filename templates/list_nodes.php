@@ -42,7 +42,7 @@ if($input->urlSegment1){
 
       // create the node markers
       foreach($nodes as $node){
-        $marker .= "L.circle([{$node->latitude}, {$node->longitude}], 10, {
+        $marker .= "L.circle([".str_replace(',','.',$node->latitude).", ".str_replace(',','.',$node->longitude)."], 10, {
                                   color:".($node->online == 1 ? "'blue'" : "'red'").",
                                   fillColor: ".($node->online == 1 ? "'blue'" : "'red'")."
                     }).addTo(map)
