@@ -58,9 +58,18 @@ article:hover a.edit{
   .text-primary{
   color: $ffyellow;
   }
+
   .container{
   padding-top: $topbar-height;
+    &:before,&:after{
+      content: "";
+      display: table;
+    }
+    &:after{
+      clear: both;
+    }
   }
+  
   .info-box{
   margin-top: $topbar-height !important;
   }

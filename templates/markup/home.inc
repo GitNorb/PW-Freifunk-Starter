@@ -16,8 +16,8 @@
  </div>
 </div>
 
-<section id='freifunk-description' data-magellan-destination='freifunk-description' class='info container row'>
- <div class='large-12 columns text-center'>
+<section id='freifunk-description' data-magellan-destination='freifunk-description' class='info container'>
+ <div class='text-center row'>
    <h2>Freifunk</h2>
    <h3 class='subheader'><small>WLAN von Bürgern für Bürger</small></h3>
    <p>
@@ -53,8 +53,8 @@
 </section><!-- #freifunk-description -->
 
 
-<section id='freifunk-faq' data-magellan-destination='freifunk-faq' class='info container row background_gray'>
-    <div class='large-12 columns text-center'>
+<section id='freifunk-faq' data-magellan-destination='freifunk-faq' class='info container background_gray'>
+    <div class='text-center row'>
       <h2>H&auml;ufige Fragen</h2>
       <h3 class='subheader'><small>in einfachen Worten erklärt!</small></h3>
       <p>
@@ -98,8 +98,8 @@
 
 <?=renderTimeline($pages->find("template=post, timeline=1, sort=-date, limit=6"))?>
 
-<section id='mitmachen' data-magellan-destination='mitmachen' class='info container row background_gray'>
-    <div class='large-12 columns'>
+<section id='mitmachen' data-magellan-destination='mitmachen' class='info container background_gray'>
+    <div class='row'>
       <div class='text-center'>
         <h2>Mitmachen</h2>
         <h3 class='subheader'><small>erweitere mit uns das Freifunk Netz</small></h3>
