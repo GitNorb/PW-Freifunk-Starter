@@ -32,10 +32,11 @@
   </table>
   <div id='map' style='width:100%; height:200px' class='map'></div>
 
-  <h2>Nodes in der Nähe (5km)</h2>
+  <h2>Nodes in der Nähe (2km)</h2>
   <ul class='node-list'>
-    <?php foreach ($nearnodes as $node) { ?>
-      <li><i class='fa fa-wifi'></i> <?=$node->get('subtitle|title')?></li>
+    <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 2);
+          foreach ($nearnodes as $node) { ?>
+      <li><i class='fa fa-wifi' style='color:<?=($page->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?></a></li>
     <?php } ?>
   </ul>
 

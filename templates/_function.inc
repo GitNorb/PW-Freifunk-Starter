@@ -474,3 +474,98 @@ function getToken($length=32){
     }
     return $token;
 }
+
+function getRouterLink($search){
+  $pages = wire('pages');
+  $pages->get('');
+}
+
+/**
+ * Umkreissuche für Nodes
+ * read: https://www.tutorials.de/threads/umkreis-um-eine-koordinate-berechnen-und-alle-koordinaten-in-db-suchen.217768/
+ *
+ * String latitude
+ * String longitude
+ * Int    dist      Distance
+ *
+ * return String Processwire Selector
+ */
+function umkreissuche($template, $latitude, $longitude, $dist = 5){
+  // Return if the Template dosn't exists
+  if(!wire('templates')->get("$template")) return;
+  $t = wire('templates')->get("$template");
+  // Return if Template didn't has latitude or longitude field!
+  if(!$t->hasField('latitude')) return;
+
+  $ursprungsbreite = str_replace(",", ".", $latitude);
+  $ursprungslaenge = str_replace(",", ".", $longitude);
+
+  $alpha = 180*$dist/(6371*3.14159);
+
+  $geo1 = str_replace(",", ".", $ursprungsbreite-$alpha);
+  $geo2 = str_replace(",", ".", $ursprungsbreite+$alpha);
+  $geo3 = str_replace(",", ".", $ursprungslaenge-$alpha);
+  $geo4 = str_replace(",", ".", $ursprungslaenge+$alpha);
+
+  // Ungenaue suche
+  $search = wire('pages')->find("template=$template, latitude>=$geo1, latitude<=$geo2, longitude>=$geo3, longitude<=$geo4");
+
+  $result = new PageArray();
+
+  $a = $ursprungsbreite/180*3.14159;
+  $b = $ursprungslaenge/180*3.14159;
+
+  $z = 1;
+  foreach($search as $value){
+    $c = str_replace(',','.',$value->latitude);
+    $d = str_replace(',','.',$value->longitude);
+    $c = $c/180*3.14159;
+    $d = $d/180*3.14159;
+
+    $e = sin($a)*sin($c);
+    $f = cos($a)*cos($c)*cos($d-$b);
+    $g = acos($e + $f);
+    $h = $g * 6378.137;
+    $ausgabe = sprintf("%01.2f", $h);
+    if($ausgabe > $dist || $h == 0) {
+      continue;
+    }
+    $result->add($value);
+  }
+
+  return $result;
+}
+/**
+ * Author : Ayman Hussein
+ * http://stackoverflow.com/questions/1416697/converting-timestamp-to-time-ago-in-php-e-g-1-day-ago-2-days-ago
+ */
+function time_elapsed_string($ptime){
+    $etime = time() - $ptime;
+
+    if ($etime < 1){
+        return '0 seconds';
+    }
+
+    $a = array( 365 * 24 * 60 * 60  =>  'year',
+                 30 * 24 * 60 * 60  =>  'month',
+                      24 * 60 * 60  =>  'day',
+                           60 * 60  =>  'hour',
+                                60  =>  'minute',
+                                 1  =>  'second'
+                );
+    $a_plural = array( 'year'   => 'Jahre',
+                       'month'  => 'Monate',
+                       'day'    => 'Tage',
+                       'hour'   => 'Stunden',
+                       'minute' => 'Minuten',
+                       'second' => 'Sekunden'
+                );
+
+    foreach ($a as $secs => $str){
+        $d = $etime / $secs;
+        if ($d >= 1){
+            $r = round($d);
+            return 'seit '. $r . ' ' . ($r > 1 ? $a_plural[$str] : $str);
+        }
+    }
+}

@@ -55,8 +55,8 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             } elseif($data['name'] != 'unbekannt') {
               $node->subtitle = $data['name'];
             }
-            $node->latitude = str_replace(',', '.', $data['geo']['latitude']);
-            $node->longitude = str_replace(',', '.', $data['geo']['longitude']);
+            $node->latitude = floatval(str_replace(',', '.', $data['geo']['latitude']));
+            $node->longitude = floatval(str_replace(',', '.', $data['geo']['longitude']));
             $node->lastseen = strtotime($data['lastseen']);
             $node->node_hardware = $data['hardware'];
             $node->node_firmware = $data['firmware'];
@@ -64,7 +64,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
             $node->online = $data['online'];
             if ($node->isChanged('latitude') ||
                 $node->isChanged('longitude')){
-                $node->address = $this->get_address($node->latitude, $node->longitude);
+                $node->address = $this->get_address(str_replace(',', '.', $node->latitude), str_replace(',','.',$node->longitude));
               }
           } else {
             $node->online = false;
