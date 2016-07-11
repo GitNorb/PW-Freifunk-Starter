@@ -110,11 +110,11 @@ if(!wire('user')->isLoggedin()){
           <?php //if($user->id == $page->createdUser->id){ echo "true";}?>
         </p>
         <ul class="inline-list">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Faq</a></li>
-          <li><a href="#">Kontakt</a></li>
+          <li><a href="<?=$homepage->httpUrl?>">Home</a></li>
+          <li><a href="<?=$pages->get("/blog/")->url?>">Blog</a></li>
+          <li><a href="<?=$pages->get("/about/")->url?>">About</a></li>
+          <li><a href="<?=$pages->get("/faq/")->url?>">Faq</a></li>
+          <li><a href="<?=$pages->get("/kontakt/")->url?>">Kontakt</a></li>
         </ul>
         <p class="copywrite">Erstellt mit <a href="http://de.processwire.com/">ProcessWire</a> und <a href="http://foundation.zurb.com/">Foundation Zurb</a>. Zu finden auf <a href="https://github.com/FreifunkMYK/PW-Freifunk-Starter">GitHub</a>.
       </div>
