@@ -16,11 +16,11 @@ if($input->urlSegment1){
       foreach($nodes as $node){
 
         $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
-                  <td>$node->subtitle</td>
+                  <td><a href='$node->httpUrl'>$node->subtitle</a></td>
                   <td>$node->title</td>
                   <td>$node->latitude</td>
                   <td>$node->longitude</td>
-                  <td>".($node->online == 1 ? "online" : "offline")."</td>
+                  <td>".($node->online == 1 ? "<span style='color:green'>online</span>" : "<span style='color:red'>offline</a>")."</td>
                   <td><a href='{$pages->get('/profile/')->httpUrl}{$node->operator->name}'>{$node->operator->name}</a></td>
                 </tr>";
       }
@@ -168,11 +168,11 @@ if($input->urlSegment1){
   foreach($nodes as $node){
 
     $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
-              <td>$node->subtitle</td>
+              <td><a href='$node->httpUrl'>$node->subtitle</a></td>
               <td>$node->title</td>
               <td>$node->latitude</td>
               <td>$node->longitude</td>
-              <td>".($node->online == 1 ? "online" : "offline")."</td>
+              <td>".($node->online == 1 ? "<span style='color:green'>online</span>" : "<span style='color:red'>offline</a>")."</td>
               <td>{$node->operator->name}</td>
             </tr>";
   }

@@ -32,15 +32,17 @@
   </table>
   <div id='map' style='width:100%; height:200px' class='map'></div>
 
-  <h2>Nodes in der Nähe (2km)</h2>
+
+
+</article><!-- #article -->
+<aside id="sidebar" class="large-3 columns">
+  <h4>Nodes in der Nähe (1km)</h4>
   <ul class='node-list'>
-    <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 2);
+    <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 1);
           foreach ($nearnodes as $node) { ?>
       <li><i class='fa fa-wifi' style='color:<?=($node->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?></a></li>
     <?php } ?>
   </ul>
 
-</article><!-- #article -->
-<aside id="sidebar" class="large-3 columns">
   <?php echo renderNewNodesList(); ?>
 </aside>
