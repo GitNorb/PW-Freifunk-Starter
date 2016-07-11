@@ -100,10 +100,10 @@ if($input->urlSegment1){
       if(!wire('user')->isLoggedin()){
         $content = "<article><h2>Gesicherte Seite</h2>Bitte Anmelden oder Registrieren.</article>";
         $session->redirectUrl = $page->path."add/";
-        if(isset($input->get->mac)) $session->mac = $sanitizer->text($input->get->mac);
-        if(isset($input->get->key)) $session->key = $sanitizer->text($input->get->key);
+        if(isset($input->get->mac)) $session->mac = strtoupper($sanitizer->text($input->get->mac));
+        if(isset($input->get->key)) $session->key = strtoupper($sanitizer->text($input->get->key));
       } elseif(!$input->post->submit) {
-        if(isset($input->get->mac)) $session->mac = $sanitizer->text($input->get->mac);
+        if(isset($input->get->mac)) $session->mac = strtoupper($sanitizer->text($input->get->mac));
         if(isset($input->get->key)) $session->key = strtoupper($sanitizer->text($input->get->key));
         $content = renderPage('node_registration');
       } else {

@@ -9,7 +9,7 @@
   <form class='omb_nodeAdd' data-abide action='./add' accept-charset='UTF-8' autocomplete='off' method='post'>
       <div class='row collapse'>
         <div class='small-6 columns'>
-          <input type='text' class='form-control' required pattern='([0-9A-Z]{2}[:]){5}([0-9A-Z]{2})' name='mac' placeholder='Example: E8:DD:08:9C:X7:78' <?php if($session->mac) echo "value='$session->mac'"?>>
+          <input type='text' class='form-control' required pattern='([0-9A-Za-z]{2}[:]){5}([0-9A-Za-z]{2})' name='mac' placeholder='Example: E8:DD:08:9C:X7:78' <?php if($session->mac) echo "value='$session->mac'"?>>
           <small class='error'>Bitte beachte die Konvention! Nur Großbuchstaben inklusive :</small>
         </div>
         <div class='small-6 columns'>
