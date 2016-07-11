@@ -171,6 +171,7 @@ if(!wire('user')->isLoggedin()){
   	// Documentation can be found at: http://foundation.zurb.com/docs
   	$(document).foundation();
   </script>
+  <?=($script ? $script : "")?>
   <noscript>
     <script src="<?=$config->urls->templates?>js/app-dist.js"></script>
     <link rel="stylesheet" href="<?php echo $config->urls->templates.'css/app.css';?>">

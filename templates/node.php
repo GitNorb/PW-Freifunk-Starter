@@ -1,2 +1,24 @@
 <?php
+$config->styles->add($config->urls->templates.'css/leaflet.css');
+$config->scripts->add($config->urls->templates.'js/leaflet-src.js');
+
+$script = "<script>
+            var map = L.map('map').setView([{$page->latitude}, {$page->longitude}], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
+            }).addTo(map);
+
+            L.circle([{$page->latitude}, {$page->longitude}], 10, {
+              color:".($page->online == 1 ? "'green'" : "'red'").",
+              fillColor: ".($page->online == 1 ? "'green'" : "'red'")."
+            }).addTo(map);
+
+            map.invalidateSize();
+          </script>";
+
+$nearnodes = umkreissuche("node", "{$page->latitude}", "{$page->longitude}");
+
+$page->losttime = time_elapsed_string($page->getUnformatted('lastseen'));
 $content = renderPage();

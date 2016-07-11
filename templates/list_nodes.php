@@ -85,14 +85,14 @@ if($input->urlSegment1){
                 map.on('locationfound', onLocationFound);
 
 
-                  $marker
+                $marker
 
-                  map.on('click', function(e){
-                    alert('Geoposition = ' + e.latlng);
-                  })
-                  $('#map').height($(window).height() - 205).width($(window).width());
-                    map.invalidateSize();
-                  </script>";
+                map.on('click', function(e){
+                  alert('Geoposition = ' + e.latlng);
+                })
+                $('#map').height($(window).height() - 205).width($(window).width());
+                  map.invalidateSize();
+                </script>";
 
       break;
     case 'add':
