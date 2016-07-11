@@ -36,7 +36,7 @@
   <ul class='node-list'>
     <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 2);
           foreach ($nearnodes as $node) { ?>
-      <li><i class='fa fa-wifi' style='color:<?=($page->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?></a></li>
+      <li><i class='fa fa-wifi' style='color:<?=($node->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?></a></li>
     <?php } ?>
   </ul>
 
