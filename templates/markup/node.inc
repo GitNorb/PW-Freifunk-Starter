@@ -40,7 +40,10 @@
   <ul class='node-list'>
     <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 1);
           foreach ($nearnodes as $node) { ?>
-      <li><i class='fa fa-wifi' style='color:<?=($node->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?></a></li>
+      <li>
+        <i class='fa fa-wifi' style='color:<?=($node->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?> </a><br>
+        <span class='node-address'><i class='fa fa-fw'></i> <?=getDistance($node->dist)?> entfernt</span>
+      </li>
     <?php } ?>
   </ul>
 
