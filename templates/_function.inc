@@ -477,9 +477,24 @@ function getToken($length=32){
     return $token;
 }
 
-function getRouterLink($search){
+/**
+ * Return a Page from searched Router
+ *
+ * return Page
+ */
+function getRouter($search){
   $pages = wire('pages');
-  $pages->get('');
+  $sanitizer = wire('sanitizer');
+  $search = explode(" ",$search);
+
+  foreach($search as $string){
+    $result = $pages->get("template=router, name|title={$sanitizer->pageName($string)}");
+    if($result->id) break;
+  }
+
+  if($result instanceof NullPage) return false;
+
+  return $result;
 }
 
 /**
@@ -556,8 +571,11 @@ function getDistance($dist){
     }
   }
 
+  if(!isset($augabe)) return;
+
   return $ausgabe;
 }
+
 /**
  * Author : Ayman Hussein
  * http://stackoverflow.com/questions/1416697/converting-timestamp-to-time-ago-in-php-e-g-1-day-ago-2-days-ago

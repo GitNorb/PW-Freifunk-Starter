@@ -164,19 +164,18 @@ if($input->urlSegment1){
   $user = wire('user')->id;
   $nodes = $pages->find("operator=$user, template=node, sort=-subtitle");
   $table = '';
-
+  
   foreach($nodes as $node){
 
     $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
               <td><a href='$node->httpUrl'>$node->subtitle</a></td>
               <td>$node->title</td>
-              <td>$node->latitude</td>
-              <td>$node->longitude</td>
+              <td>$node->node_firmware</td>
               <td>".($node->online == 1 ? "<span style='color:green'>online</span>" : "<span style='color:red'>offline</a>")."</td>
               <td>{$node->operator->name}</td>
             </tr>";
   }
 
   $page->table = $table;
-  $content = renderPage();
+  $content = renderPage('list_nodes_private');
 }

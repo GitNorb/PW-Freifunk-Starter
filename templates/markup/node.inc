@@ -15,7 +15,16 @@
     </tr>
     <tr>
       <th>Hardware</th>
-      <td><?=$page->node_hardware?></td>
+      <td>
+        <?php
+          $router = getRouter($page->node_hardware);
+          if($router){
+            echo "<a href='{$router->httpUrl}'>$page->node_hardware</a>";
+          } else {
+            echo $page->node_hardware;
+          }
+        ?>
+      </td>
     </tr>
     <tr>
       <th>Firmware</th>
