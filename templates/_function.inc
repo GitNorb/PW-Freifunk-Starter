@@ -28,6 +28,8 @@
   * @return String - html markup string of copyright statement
   */
 
+setlocale(LC_NUMERIC, 'en_US.UTF-8');
+
 #########################################################
 # getter
 #########################################################
@@ -502,10 +504,10 @@ function umkreissuche($template, $latitude, $longitude, $dist = 5){
 
   $alpha = 180*$dist/(6371*3.14159);
 
-  $geo1 = str_replace(",", ".", $ursprungsbreite-$alpha);
-  $geo2 = str_replace(",", ".", $ursprungsbreite+$alpha);
-  $geo3 = str_replace(",", ".", $ursprungslaenge-$alpha);
-  $geo4 = str_replace(",", ".", $ursprungslaenge+$alpha);
+  $geo1 = $ursprungsbreite-$alpha;
+  $geo2 = $ursprungsbreite+$alpha;
+  $geo3 = $ursprungslaenge-$alpha;
+  $geo4 = $ursprungslaenge+$alpha;
 
   // Ungenaue suche
   $search = wire('pages')->find("template=$template, latitude>=$geo1, latitude<=$geo2, longitude>=$geo3, longitude<=$geo4");
@@ -526,14 +528,30 @@ function umkreissuche($template, $latitude, $longitude, $dist = 5){
     $f = cos($a)*cos($c)*cos($d-$b);
     $g = acos($e + $f);
     $h = $g * 6378.137;
-    $ausgabe = sprintf("%01.2f", $h);
+    $ausgabe = sprintf("%01.3f", $h);
     if($ausgabe > $dist || $h == 0) {
       continue;
     }
+
+    $value->set('dist', $ausgabe);
     $result->add($value);
   }
 
   return $result;
+}
+
+function getDistance($dist){
+  $a = array( 'km'  => 1,
+              'm' => 0.001);
+
+  foreach ($a as $metric => $key) {
+    $b = $dist / $key;
+    if ($b >= 1){
+      $ausgabe = "$b $metric";
+    }
+  }
+
+  return $ausgabe;
 }
 /**
  * Author : Ayman Hussein
