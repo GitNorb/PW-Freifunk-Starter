@@ -492,7 +492,7 @@ function getRouterLink($search){
  *
  * return String Processwire Selector
  */
-function umkreissuche($template, $latitude, $longitude, $dist = 5){
+function umkreissuche($template, $latitude, $longitude, $dist = 5, $sort = true){
   // Return if the Template dosn't exists
   if(!wire('templates')->get("$template")) return;
   $t = wire('templates')->get("$template");
@@ -537,17 +537,22 @@ function umkreissuche($template, $latitude, $longitude, $dist = 5){
     $result->add($value);
   }
 
+  if($sort){
+    $result = $result->sort('dist');
+  }
   return $result;
 }
 
 function getDistance($dist){
   $a = array( 'km'  => 1,
-              'm' => 0.001);
+              'm'   => 0.001);
 
   foreach ($a as $metric => $key) {
     $b = $dist / $key;
-    if ($b >= 1){
+    if (intval($b) >= 1){
+      $b = round($b, 2);
       $ausgabe = "$b $metric";
+      break;
     }
   }
 

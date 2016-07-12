@@ -10,9 +10,10 @@ $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 5);
 $marker = '';
 foreach($nearnodes as $node){
   $marker .= "L.circle([".str_replace(',','.',$node->latitude).",".str_replace(',','.',$node->longitude)."], 10,{
-        color:'blue',
-        fillColor:".($page->online == 1 ? "'green'" : "'red'"). "
-      }).addTo(map);";
+                color:'blue',
+                fillColor:".($page->online == 1 ? "'green'" : "'red'"). "
+              }).addTo(map)
+                .bindPopup('<a href=\"".$node->httpUrl."\">{$node->subtitle}</a><br>".getDistance($node->dist)." entfernt');";
 }
 
 $script = "<script>

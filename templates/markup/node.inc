@@ -29,6 +29,12 @@
       <th>Map</th>
       <td><a href='http://status.freifunk-myk.de/#!v:m;n:<?=strtolower(str_replace(":", "", $page->title))?>'><?=$page->address?></a></td>
     </tr>
+    <?php if(wire('user')->isLoggedin()){ ?>
+    <tr>
+      <th>Betreiber</th>
+      <td><a href='<?=$page->createdUser->httpUrl?>'><?=$page->createdUser->get('name|title')?></a></td>
+    </tr>
+    <?php } ?>
   </table>
   <div id='map' style='width:100%; height:200px' class='map'></div>
 
@@ -36,9 +42,9 @@
 
 </article><!-- #article -->
 <aside id="sidebar" class="large-3 columns">
-  <h4>Nodes in der Nähe (1km)</h4>
+  <h4>Nodes in der Nähe (2km)</h4>
   <ul class='node-list'>
-    <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 1);
+    <?php $nearnodes = umkreissuche("node", $page->latitude, $page->longitude, 2);
           foreach ($nearnodes as $node) { ?>
       <li>
         <i class='fa fa-wifi' style='color:<?=($node->online ? 'green' : 'red')?>'></i> <a href='<?=$node->httpUrl?>'><?=$node->get('subtitle|title')?> </a><br>
