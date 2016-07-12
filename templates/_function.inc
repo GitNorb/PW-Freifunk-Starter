@@ -568,10 +568,10 @@ function getDistance($dist){
       $b = round($b, 2);
       $ausgabe = "$b $metric";
       break;
+    } else {
+      $ausgabe = "> 1 m";
     }
   }
-
-  if(!isset($augabe)) return;
 
   return $ausgabe;
 }
