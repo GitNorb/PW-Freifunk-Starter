@@ -25,7 +25,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
           $this->src = $this->data ['src'];
 
       // run the module every 2 minutes
-      $this->addHook('LazyCron::every2Minutes', $this, 'set_nodeinfo');
+      //$this->addHook('LazyCron::every2Minutes', $this, 'set_nodeinfo');
     }
 
     protected function cache_data() {
