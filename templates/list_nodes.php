@@ -156,6 +156,12 @@ if($input->urlSegment1){
             $content = "<h2>Nodes Hinzufügen</h2><ul>$content</ul>";
           }
         break;
+        case 'update':
+          if($input->get->key != "nre7u97ea") throw new Wire404Exception;
+          $update = $modules->get('ffNodeInfo');
+          $update->set_nodeinfo(new HookEvent);
+          $content = "Node Info Updated";
+        break;
     default:
       throw new Wire404Exception();
   }
@@ -164,7 +170,7 @@ if($input->urlSegment1){
   $user = wire('user')->id;
   $nodes = $pages->find("operator=$user, template=node, sort=-subtitle");
   $table = '';
-  
+
   foreach($nodes as $node){
 
     $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
