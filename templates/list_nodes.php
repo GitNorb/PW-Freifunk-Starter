@@ -158,9 +158,10 @@ if($input->urlSegment1){
         break;
         case 'update':
           if($input->get->key != "nre7u97ea") throw new Wire404Exception;
+          $useMain = false;
           $update = $modules->get('ffNodeInfo');
           $update->set_nodeinfo(new HookEvent);
-          $content = "Node Info Updated";
+          echo "Node Info Updated";
         break;
     default:
       throw new Wire404Exception();

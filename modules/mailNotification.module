@@ -113,8 +113,8 @@ class mailNotification extends WireData implements Module, ConfigurableModule {
       // if this post wasn't made by an "user" don't continue
       if($page->createdUser->hasRole('admin|manager')) return;
 
-      $subject = sprintf(__('%s has deleted by %s'), $page->get('headline|title'), $page->createdUser->get('name|title'));
-      $message = sprintf(__("%s deleted by %s \n========================= \n\nYou can find it in the bin and restore it."), $page->get('headline|title'), $page->createdUser->get('name|title'));
+      $subject = sprintf(__('%s has deleted by %s'), $page->get('headline|title'), $user->get('title'));
+      $message = sprintf(__("%s deleted by %s \n========================= \n\nYou can find it in the bin and restore it."), $page->get('headline|title'), $user->get('name|title'));
 
       $this->sendMail($subject, $message);
       // Message to User

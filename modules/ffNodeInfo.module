@@ -75,8 +75,7 @@ class ffNodeInfo extends WireData implements Module, ConfigurableModule{
           }
           $node->of(true);
         }
-
-        $this->message(__('Node Informationen aktualisiert'));
+        return true;
     }
 
     public function get_address($latitude, $longitude){
