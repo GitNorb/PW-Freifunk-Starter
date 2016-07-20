@@ -27,6 +27,19 @@ function pagesToXml(PageArray $items) {
   return arrayToXml($a, $xml_data);
 }
 
+function pageToYaml(PageArray $item){
+  $a = array();
+  foreach($items as $item){
+    if($item->template == "router"){
+      $a[] = routerToArray($item);
+    } else {
+      $a[] = pageToArray($item);
+    }
+  }
+
+  return yaml_emit($a);
+}
+
 function arrayToXml($data, &$xml_data){
   foreach($data as $key => $value){
       if(is_array($value)) {
@@ -141,6 +154,12 @@ if($input->urlSegment1 == "json"){
   $useMain = false;
   header("Content-type: application/json");
   echo pagesToJSON($routers);
+
+} else if ($input->urlSegment1 == "yaml"){
+
+  $useMain = false;
+  //var_dump(pageToYaml($routers));
+  //phpinfo();
 
 } else {
   $output = '';
