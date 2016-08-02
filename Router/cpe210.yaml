@@ -1,25 +1,33 @@
 title: "CPE210"
 hersteller: "TP-LINK"
 image:
- data: "https://www.ffmyk.de/site/assets/files/1233/2016-07-13_10_17_16.jpg"
- description: ""
+  data: "https://www.ffmyk.de/site/assets/files/1233/2016-07-13_10_17_16.jpg"
+  description: ""
 description: "<p>Marktpreis ca. 50,- €</p>\n\n<p> </p>\n\n<p> </p>"
 hardware:
   ram: ""
   flash: ""
   cpu: ""
+  chip: ""
+  wlan: ""
+  lan: ""
   price: ""
 images:
   data: "https://www.ffmyk.de/site/assets/files/1233/2016-07-13_10_23_52.jpg"
   description: "Alternativvorschlag zur Befestigung wenn kein Rohr in der nähe. Besteht aus 20 cm Installationsrohr M25 oder M32 mit zwei Schellen."
 features:
- - "richtfunk"
- - "gunstig"
- - "outdoor"
- - "2.4ghz"
- - "antenne-9dbi"
+  - "richtfunk"
+  - "günstig"
+  - "outdoor"
+  - "2.4ghz"
+  - "antenne-9dbi"
 infoBlocks:
  1:
    title: "Befestigungstipps"
    body: "<p>Falls für die Befestigung des Routers kein geeignetes Rohr zur verfügung steht lässt sich mit einfachen Mitteln eine Wandhalterung basteln. Sie besteht aus einem 20 cm Installationsrohr M25 oder M32 und zwei Schellen, der Router wird mit zwei Kabelbinder an dem Rohr befestigt. (siehe Foto)</p>\n\n<figure class=\"align_center\"><a href=\"/site/assets/files/1233/2016-07-13_10_23_52.jpg\"><img alt=\"\" src=\"/site/assets/files/1233/2016-07-13_10_23_52.342x0-is.jpg\" width=\"342\" /></a>\n\n<figcaption>Alternative Befestigung mit Installationsrohr und Schellen.</figcaption></figure>"
 outdatet: false
+Version:
+  V1:
+    Support: Stable
+  V11:
+    Support: Broken

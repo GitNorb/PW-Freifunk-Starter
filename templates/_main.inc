@@ -23,7 +23,7 @@ $config->styles->add($config->urls->templates.'css/app.css');
 $config->scripts->add($config->urls->templates.'js/app-dist.js');
 
 /********************************
-* Hendle Login
+* Handle Login
 *******************************/
 if(!wire('user')->isLoggedin()){
 	if($input->post->user && $input->post->pass) {

@@ -1,0 +1,3 @@
+Model,Menufacture,Description,Chip,RAM,CPU,Flash,WLAN,LAN,Price,Features,outdatet,Version,Support,,,
+CPE210,TP-LINK,Günstiger Outdoor Router für Richtfunkstrecken oder zum Außläuchten von Plätzen,ar9344,64MB,,8MB,11b/g/n,1 10/100E + 1 pass through,ca. 55€,"Richtfunk,Günstig,Outdoor,2.4Ghz,Antenne-9dbi",false,,,,, 
+CPE220,TP-LINK,,,,,,,,,,,,,,,
