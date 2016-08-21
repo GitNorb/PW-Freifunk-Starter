@@ -16,6 +16,20 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         );
     }
 
+    public function set($type, $value){
+      switch ($type) {
+        case 'user':
+          $this->user = $value;
+          break;
+        case 'pass'
+          $this->pass = $value;
+          break;
+        case 'email'
+          $this->email = $value;
+          break;
+        }
+    }
+
     public function ___install() {
         if (!function_exists('ldap_connect'))
             throw new WireException ('Please make sure that extension php_ldap is loaded.');
@@ -163,18 +177,52 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       }
     }
 
+    public function save(array $user){
+      if(empty($user['username'])) return;
+
+      return $this->LdapHelperUpdate($user);
+    }
+
+    protected LdapHelperUpdate(array $user){
+      if(!$con = $this->ldapHelperConnect()) return; // Connection Failed
+      $username = $user['username'];
+      $search = "(uid=$user)";
+
+      if(isset($user['newpassword'])){
+        $entry["userPassword"] = $user['newpassword'];
+      }
+
+      $user_search = ldap_search($con, "dc=ffmyk, dc=de","(|)");
+      $user_get = ldap_get_entries($con, $user_search);
+      $user_entry = ldap_first_entry($con, $user_search);
+      $user_dn = ldap_get_dn($con, $user_entry);
+
+      if(isset($user['oldpassword'])){
+        $oldpassword = $user['oldpassword'];
+        if(ldap_bind($con, $user_dn, $oldpassword) === false) { // to change password
+          return false;
+        }
+      } else(isset($user['token']) && $user['token'] === true) { // to reset password
+        ldap_bind($con, $user_dn, )
+      }
+
+      if(ldap_modify($con, $user_dn, $entry) == false){
+        $error = ldap_error($con);
+        $errno = ldap_errno($con);
+        $message = "$errno - $error";
+        return false;
+      }
+    }
+
+    /*
     protected function ldapHelperChangePw(HookEvent $event) {
         $return = $event->arguments[0];
 
-        $this->message("Password: $return");
-
-        /*$page = $event->arguments[0];
+        $page = $event->arguments[0];
         $user = wire('user');
         $users = wire('users');
 
-        $this->message("Page Save");
         if($page->template != 'user' || !$page->id) return;
-
 
         foreach($event->arguments[1] as $key => $argument){
           $this->message("$key: $argument");
@@ -184,10 +232,8 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
 
         if($page->isChanged('pass'))
           $page->of(false);
-          $this->message("Password Changed to {$page->pass}");
-          $page->of(true); */
 
-        /*if(!$con = $this->ldapHelperConnect()) return;
+        if(!$con = $this->ldapHelperConnect()) return;
 
         $user_search = ldap_search($con,"dc=ffmyk,dc=de","(|(uid=$user))");
         $user_get = ldap_get_entries($con, $user_search);
@@ -205,8 +251,8 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
             $error = ldap_error($con);
             $errno = ldap_errno($con);
             $message = "$errno - $error";
-        }*/
-      }
+        }
+      }*/
 
     public function ldapHelperDeleteUser(HookEvent $event) {
         $page = $event->arguments("page");
