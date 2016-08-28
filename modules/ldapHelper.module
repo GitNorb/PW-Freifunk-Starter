@@ -16,7 +16,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         );
     }
 
-    public function set($type, $value){
+    /*public function set($type, $value){
       switch ($type) {
         case 'user':
           $this->user = $value;
@@ -28,7 +28,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
           $this->email = $value;
           break;
         }
-    }
+    }*/
 
     public function ___install() {
         if (!function_exists('ldap_connect'))

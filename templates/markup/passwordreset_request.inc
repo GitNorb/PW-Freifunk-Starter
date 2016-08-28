@@ -3,8 +3,8 @@
 
   <form action='./pwreset' id="form_2" method="post">
     <label for="email">E-Mail</label>
-    <input type="text" id="email" maxlength="40">
-    <button type="submit">Password Zurücksetzen</button>
+    <input type="text" id="email" name="email" maxlength="40">
+    <button class='button' type='submit' name='submit' value='add'>Password Zurücksetzen</button>
   </form>
 
 </article>
