@@ -35,6 +35,46 @@ function makeTable(PageArray $pages, $tableArray, $status = false){
 // Nur eingeloggte User können Benutzerkonten ansehen
 if(!wire('user')->isLoggedin()) throw new Wire404Exception();
 
+// Password reset funktion
+if($input->urlSegment1 == "pwreset") {
+
+  if($input->post->token && $input->post->token == $wire->user->get($input->post->user)->authkey){
+
+    if($input->get->newpassword) {
+      $ldapuser['username'] = $input->post->user;
+      $ldapuser['newPassword'] = $input->get->newpassword;
+      if($ldap->save($ldapuser)){
+        $content = "Password gespeichert, du kannst dich nun einloggen.";
+      } else {
+        $content = "Es ist ein fehler aufgetreten, versuche es zu einem Späteren Zeitpunkt noch einmal!";
+      }
+    } else {
+      $t = new TemplateFile($config->paths->templates ."markup/passwordreset.inc");
+    }
+
+  } else {
+    if($input->post->email){
+      $u = $wire->user->get($sanitizer->email($input->post->email));
+      $u->authkey = getToken();
+
+      $reseturl = wire('page')->httpUrl ."?token=". $u->authkey ."&user=". $u->name;
+      $mail = wireMail();
+      $mail->to($u["email"])->from('reset@ffmyk.de');
+      $mail->subject("Reset Password");
+      $mail->body("===== Password Zurücksetzen ===== \n\n
+      mit dieser E-Mail kannst du dein Password zurücksetzen.\n
+      $reseturl \n
+      Sollte der Link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
+      if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
+
+      $content = "Du erhälst eine E-Mail mit einem Link, falls das keine E-Mail ankommt versuche es später noch einmal.";
+    }
+    $t = new TemplateFile($config->paths->templates ."markup/passwordreset_request.inc");
+  }
+
+  $content = $t->render();
+}
+
 // Wenn inputsegment 1 nicht gesetzt ist dann leite auf den aktuellen Benutzer weiter.
 if(!$input->urlSegment1) $session->redirect("{$pages->get('/profile/')->url}{$user->name}");
 
@@ -43,20 +83,6 @@ if($input->urlSegment2 == "edit"){
   if($input->urlSegment1 != $user->name) $session->redirect("{$pages->get('/profile/')->url}{$user->name}/edit");
   // Get User Objekt from current User
   $u = $users->get("name={$user->name}");
-
-  if($input->post){
-    $u->firstname = $sanitizer->text($input->post->firstname);
-    $u->lastname = $sanitizer->text($input->post->lastname);
-    $u->email = $satinizier->email($input->post->email);
-    $u->public_key = $sanitizer->text($input->post->publicKey);
-
-    // Check if it is the right Password
-    if($session->authenticate($user, $sanitizer->text($input->post->password))){
-      $u->of(false);
-      $u->save();
-      $u->of(true);
-    }
-  }
 
   $t = new TemplateFile($config->paths->templates ."markup/profile_edit.inc");
   $t->set('firstname', $u->firstname);
@@ -87,6 +113,6 @@ if($input->urlSegment2 == "edit"){
   }
   $page->userlist = "<ul>$liste</ul>";
 
-  $content = ($user->id === $u->id ? renderPage('profile_private') : renderPage());
+  if(empty($content)) $content = ($user->id === $u->id ? renderPage('profile_private') : renderPage());
 
 }
