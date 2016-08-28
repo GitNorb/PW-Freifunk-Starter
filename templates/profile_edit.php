@@ -2,10 +2,12 @@
 
 $ldap = $modules->get("ldaphelper");
 
-$ldapuser['username'] = $username;
-$ldapuser['oldpassword'] = $oldpassword;
-$ldapuser['newpassword'] = $newpassword;
-$ldap->save($ldapuser);
+if($input->get->username){
+  $ldapuser['username'] = $input->get->username;
+  if(isset($input->get->oldpassword)) $ldapuser['oldPassword'] = $input->get->oldpassword;
+  $ldapuser['newPassword'] = $input->get->newpassword;
+  $ldap->save($ldapuser);
+}
 
 
 ?>
