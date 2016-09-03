@@ -377,6 +377,37 @@ function registerNode($mac, $key){
   return $content;
 }
 
+/**
+ * deleteNode deletes one ore more nodes.
+ */
+function deleteNode($posts){
+  // Erzeuge ein Array aus $posts
+  if(!$posts instanceof PageArray){
+    if($posts instanceof Page){
+      $post = $posts;
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(empty($posts)){
+      $post = wire('page');
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(is_string($posts)){
+      // selector string
+      $selector = $posts;
+      $posts = wire('pages')->find("$selector");
+    }
+  }
+
+  foreach($posts as $post){
+    if($post->template != "node") break; // Only for nodes
+    $pages = wire('pages');
+
+    $pages->delete($post, true);
+  }
+
+  return true;
+}
+
 function registerUser($u){
   // inizialisation ldapHelper Module for Ldap Registration
   $ldapHelper = wire('modules')->get("ldapHelper");

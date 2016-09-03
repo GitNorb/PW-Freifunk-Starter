@@ -4,6 +4,14 @@
     <tr>
       <th>Name</th>
       <td><?=$page->subtitle?></td>
+      <?php if($page->createdUser == $user && $input->get->delete){ ?>
+        <div class="alert-box alert"> Bist du sicher das du diesen Node löschen möchtest? Dies kannst du nicht rückgängig machen.
+          <form action="./" method="post">
+            <input type="checkbox" name="delete" value="node"> Ich möchte den Node <?=$page->get('subtitle|title')?> löschen.<br>
+            <button class="btn secondary" type="submit" value="submit">Unwiederruflich Löschen</button>
+          </form>
+        </div>
+      <?php } ?>
     </tr>
     <tr>
       <th>MAC</th>
@@ -47,7 +55,9 @@
   </table>
   <div id='map' style='width:100%; height:200px' class='map'></div>
 
-
+  <?php if($page->createdUser == $user){ ?>
+    <a href="?delete=true""><button class="btn alert"><i class="fa fa-close"></i> Delete</button></a>
+  <?php } ?>
 
 </article><!-- #article -->
 <aside id="sidebar" class="large-3 columns">
