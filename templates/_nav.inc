@@ -56,7 +56,7 @@ function isActive(Page $page, Page $nav){
               <a href="<?= $pages->get("/node/")->httpURL ?>"><i class='fa fa-wifi'></i> Nodes</a>
             </li>
             <li>
-              <a href="<?= $pages->get('/static-ip/')->httpURL ?>"><i class='fa fa-server'></i> Statische IPs</a>
+              <a href="<?= $pages->get('/services/')->httpURL ?>"><i class='fa fa-server'></i> Services</a>
             </li>
             <?php if(wire('user')->hasPermission('page-create')) { ?>
               <li>

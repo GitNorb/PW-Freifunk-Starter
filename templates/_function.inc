@@ -52,6 +52,26 @@ function getTag(PageArray $tags, $limit = 0){
   return $list;
 }
 
+function getPageArray($posts){
+  // Erzeuge ein Array aus $posts
+  if(!$posts instanceof PageArray){
+    if($posts instanceof Page){
+      $post = $posts;
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(empty($posts)){
+      $post = wire('page');
+      $posts = new PageArray();
+      $posts->add($post);
+    } else if(is_string($posts)){
+      // selector string
+      $selector = $posts;
+      $posts = wire('pages')->find("$selector");
+    }
+  }
+  return $posts;
+}
+
 ###################################################
 # Render
 ####################################################
@@ -298,8 +318,67 @@ function renderNewNodesList(){
   return $output;
 }
 
+#########################################################
+# Mac Address Handling
+#########################################################
+function validateMac($mac){
+  // 01:23:45:67:89:ab
+  if (preg_match('/^([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}$/', $mac))
+    return true;
+  // 01-23-45-67-89-ab
+  if (preg_match('/^([a-fA-F0-9]{2}\-){5}[a-fA-F0-9]{2}$/', $mac))
+    return true;
+  // 0123456789ab
+  else if (preg_match('/^[a-fA-F0-9]{12}$/', $mac))
+    return true;
+  // 0123.4567.89ab
+  else if (preg_match('/^([a-fA-F0-9]{4}\.){2}[a-fA-F0-9]{4}$/', $mac))
+    return true;
+  else
+    return false;
+}
+
+function normalizeMac($mac){
+  // remove any dots
+  $mac =  str_replace(".", "", $mac);
+
+  // replace dashes with colons
+  $mac =  str_replace("-", ":", $mac);
+
+  // counting colons
+  $colon_count = substr_count ($mac , ":");
+
+  // insert enough colons if none exist
+  if ($colon_count == 0)
+  {
+    $mac =  substr_replace($mac, ":", 2, 0);
+    $mac =  substr_replace($mac, ":", 5, 0);
+    $mac =  substr_replace($mac, ":", 8, 0);
+    $mac =  substr_replace($mac, ":", 11, 0);
+    $mac =  substr_replace($mac, ":", 14, 0);
+  }
+
+  // uppercase
+  $mac = strtoupper($mac);
+
+  // DE:AD:BE:EF:10:24
+  return $mac;
+}
+
+function serializeMac($serialize){
+  $serialize = getPageArray($serialize);
+  $serialize_array = array();
+
+  foreach($serialize as $one){
+        $serialize_array[] = array('mac' => strtolower(str_replace(":", "", $one->title)),
+                          'staticip' => strtoupper($one->static_ip));
+  }
+
+  return serialize($serialize_array);
+}
+
 ##########################################################
-# Sonstiges
+# Page and User handling
 #########################################################
 function listPages(PageArray $pages){
   $output = "";
