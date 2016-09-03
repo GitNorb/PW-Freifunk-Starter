@@ -181,27 +181,37 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       if(empty($user['username'])) return;
 
       if(isset($user['reset'])){
-        return $this->LdapHelperReset($user);
+        return $this->ldapHelperReset($user);
       } else {
-        return $this->LdapHelperUpdate($user);
+        return $this->ldapHelperUpdate($user);
       }
     }
 
-    protected LdapHelperReset(array $user){
-      if(!$con = $this->ldapHelperConnect()) return; // Connection Failed
-      $r = $this->ldapHelperWrite($con); // write access to LDAP
+    protected function ldapHelperReset(array $user){
+      if(!$username = $user['user']) return false; // Return if no Username was set.
+      if(!$newPassword = $user['newPassword']) return false; // Return without new Password.
+
+      if(!$con = $this->ldapHelperConnect()) return false; // Connection Failed
+      if(!$r= $this->ldapHelperWrite($connect)) return false; // Write Accesss
+
+      $user_search = ldap_search($con, "dc=ffmyk,dc=de","(|$username)");
+      $user_get = ldap_get_entries($con, $user_search);
+      $user_entry = ldap_first_entry($con, $user_search);
+
       $dn = "uid=".$username.",dc=ffmyk,dc=de";
+      $user_entry['userPassword'] =  $this->makeSshaPassword($newPassword);
 
-      $entry['userPassword'] =  $this->makeSshaPassword($newPassword);
-
-      if(ldap_mod_replace($con, $dn, $newEntry)) {
-          return true;
-      } else {
-          return false;
+      if(!$r = ldap_mod_replace($con, $dn, $user_entry)) {
+        $error = ldap_error($con);
+        $errno = ldap_errno($con);
+        $this->log->save('ldap_helper', "Change Password failed $error ($errno)");
+        return false;
       }
+
+      return true;
     }
 
-    protected LdapHelperUpdate(array $user){
+    protected function ldapHelperUpdate(array $user){
       if(!$con = $this->ldapHelperConnect()) return; // Connection Failed
 
       $username = $user['username'];
@@ -213,7 +223,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
         $entry["userPassword"] = $this->makeSshaPassword($newPassword);
       }
 
-      $user_search = ldap_search($con, "dc=ffmyk, dc=de","(|)");
+      $user_search = ldap_search($con, "dc=ffmyk,dc=de","(|$username)");
       $user_get = ldap_get_entries($con, $user_search);
       $user_entry = ldap_first_entry($con, $user_search);
       $user_dn = ldap_get_dn($con, $user_entry);
@@ -225,7 +235,7 @@ class ldapHelper extends WireData implements Module, ConfigurableModule
       if(ldap_modify($con, $user_dn, $entry) == false){
         $error = ldap_error($con);
         $errno = ldap_errno($con);
-        $message = "$errno - $error";
+        $this->log->save('ldap_helper', "Change Password failed $error ($errno)");
         return false;
       }
     }

@@ -32,60 +32,14 @@ function makeTable(PageArray $pages, $tableArray, $status = false){
   return $table;
 }
 
-// Nur eingeloggte User können Benutzerkonten ansehen
-if(!wire('user')->isLoggedin()) throw new Wire404Exception();
-
-// Password reset funktion
 if($input->urlSegment1 == "pwreset") {
-
-  if($input->post->token && $sanitizer->name($input->post->token) == $wire->user->get($sanitizer->name($input->post->user))->authkey){
-    $t = new TemplateFile($config->paths->templates ."markup/passwordreset.inc");
-  } else {
-    $t = new TemplateFile($config->paths->templates ."markup/passwordreset_request.inc");
-  }
-
-  $content = $t->render();
-
-  // Nach dem Speichern eines Formulars
-  if($input->post->submit || $input->get->submit){
-
-      // Wenn ein neues Password gesetzt wurde
-      if($input->get->newpassword){
-        $ldapuser['username'] = $input->post->user;
-        $ldapuser['newPassword'] = $input->get->newpassword;
-        if($ldap->save($ldapuser)){
-          $content = "Password gespeichert, du kannst dich nun einloggen.";
-        } else {
-          $content = "Es ist ein fehler aufgetreten, versuche es zu einem Späteren Zeitpunkt noch einmal!";
-        }
-      }
-
-      // Wenn ein Request gesendet wird
-      if($input->post->email){
-        $email = $sanitizer->email($input->post->email);
-        $u = wire('users')->get("email=$email");
-
-        $u->of(false);
-        $u->authkey = getToken();
-        $u->save();
-        $u->of(true);
-
-        $reseturl = wire('page')->httpUrl ."?token=". $u->authkey ."&user=". $u->name;
-        $mail = wireMail();
-        $mail->to($u->email)->from('reset@ffmyk.de');
-        $mail->subject("Reset Password");
-        $mail->body("===== Password Zurücksetzen ===== \n\n
-        mit dieser E-Mail kannst du dein Password zurücksetzen.\n
-        $reseturl \n
-        Sollte der Link nicht anklickbar sein, kopiere ihn und füge ihn in die Adresszeile deines Browsers ein.");
-        if($mail->send()) wire('log')->message('Send Mail: Account Aktivierung') ;
-
-        $content = "Du erhälst eine E-Mail mit einem Link, falls keine E-Mail ankommt versuche es später noch einmal.";
-      }
-    }
+  //if(wire('user')->isLoggedin()) throw new Wire404Exception();
+  include_once('passwordreset.php');
 }
 
 // Wenn inputsegment 1 nicht gesetzt ist dann leite auf den aktuellen Benutzer weiter.
+// Nur eingeloggte User können Benutzerkonten ansehen
+if(!wire('user')->isLoggedin() && $input->urlSegment1 != "pwreset") throw new Wire404Exception();
 if(!$input->urlSegment1) $session->redirect("{$pages->get('/profile/')->url}{$user->name}");
 
 
