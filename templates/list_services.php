@@ -5,11 +5,10 @@ if($input->urlSegment2) throw new Wire404Exception();
 if($input->urlSegment1){
   switch($input->urlSegment1){
     case 'list':
-      $services = $pages->find('template=services, sort=-subtitle');
+      $services = $pages->find('template=service, sort=-subtitle');
       $table = '';
 
       foreach($services as $service){
-
         $status = ($service->online == 1 ? "alert success" : "alert danger");
         $table .="<tr class='$status'>
                   <td>$service->subtitle</td>
@@ -53,8 +52,8 @@ if($input->urlSegment1){
 
           // Add new if not exist
           $mac = strtoupper($input->post->mac);
-          $s = createPage('service', $parent, $mac);
-          $s->subtitle = $input->post->title;
+          $s = createPage('service', $parent, normalizeMac($mac));
+          $s->subtitle = $sanitizer->title($input->post->title);
           $s->operator = $operator;
           $s->static_ip = $ip;
           $s->save();
