@@ -14,7 +14,6 @@ if($input->urlSegment1){
       $table = '';
 
       foreach($nodes as $node){
-
         $table .="<tr class='".($node->online == 1 ? "alert success" : "alert danger")."'>
                   <td><a href='$node->httpUrl'>$node->subtitle</a></td>
                   <td>$node->title</td>
@@ -110,7 +109,7 @@ if($input->urlSegment1){
         // Validate Mac Address
         if(validateMac($input->post->mac)){
           //  Register Node
-          $content = registerNode($input->post->mac, $input->post->key);
+          $content = registerNode($input->post->mac, trim($input->post->key));
           $content = "<h2>Node Hinzugefügt</h2><ul>$content</ul>";
         } else {
           $content = "<h2>Falsche Mac</h2>";
