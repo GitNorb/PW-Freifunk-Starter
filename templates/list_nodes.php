@@ -107,9 +107,14 @@ if($input->urlSegment1){
         if(isset($input->get->key)) $session->key = strtoupper($sanitizer->text($input->get->key));
         $content = renderPage('node_registration');
       } else {
-        //  Register Node
-        $content = registerNode($input->post->mac, $input->post->key);
-        $content = "<h2>Node Hinzugefügt</h2><ul>$content</ul>";
+        // Validate Mac Address
+        if(validateMac($input->post->mac)){
+          //  Register Node
+          $content = registerNode($input->post->mac, $input->post->key);
+          $content = "<h2>Node Hinzugefügt</h2><ul>$content</ul>";
+        } else {
+          $content = "<h2>Falsche Mac</h2>";
+        }
       }
       break;
       case 'keys':

@@ -322,6 +322,8 @@ function renderNewNodesList(){
 # Mac Address Handling
 #########################################################
 function validateMac($mac){
+  // trim
+  $mac = trim($mac);
   // 01:23:45:67:89:ab
   if (preg_match('/^([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}$/', $mac))
     return true;
@@ -339,6 +341,9 @@ function validateMac($mac){
 }
 
 function normalizeMac($mac){
+  // trim
+  $mac = trim($mac);
+
   // remove any dots
   $mac =  str_replace(".", "", $mac);
 
@@ -422,6 +427,8 @@ function createPage($template, $parent, $title){
 function registerNode($mac, $key){
   if(empty($mac) || empty($key)) return false;
 
+  // Normalize Mac Address
+  $mac = normalizeMac($mac);
   $page = wire('page');
   $node = wire('pages')->get("template=node, title=$mac");
   $parent = wire('pages')->get($page->id);
