@@ -42,7 +42,7 @@ function isActive(Page $page, Page $nav){
       <li <?php echo (isActive($page, $pages->get("/router/")) ? "class='active'" : "class=''"); ?>>
         <a href="<?=$pages->get("/router/")->url?>">Router</a>
       </li>
-      <li><a href="http://map.freifunk-myk.de">Karte</a></li>
+      <li><a href="http://status.freifunk-myk.de">Karte</a></li>
       <li class="has-dropdown">
         <?php if(!wire('user')->isLoggedin()){ ?>
           <a href="#" data-dropdown="signin">Anmelden</a>
